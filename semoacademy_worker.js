@@ -34,6 +34,30 @@ const DEEP = {"영어":"고학년으로 갈수록 독해 지문이 길어지고 
 
 function seedRng(str){ let h=2166136261; for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619);} return function(){ h+=0x6D2B79F5; let t=h; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }; }
 function pick(rng,arr){ return arr[Math.floor(rng()*arr.length)]; }
+
+// ---------- 썸네일 ----------
+// 나중에 image/ 폴더에 넣을 이미지 파일명 30장. 비어있으면 placeholder 표시.
+const THUMBS = [
+  // 예: "pexels-419907350-37856472.jpg", "pexels-betul-341981540-32814268.jpg", ...
+  // 이미지 업로드 후 여기에 파일명만 채우면 자동 반영됩니다.
+];
+const THUMB_DIR = "/image"; // 이미지 접근 경로 (단말기 방식 확인 후 조정 가능)
+function thumbFor(key){
+  if(!THUMBS.length) return null;
+  const rng = seedRng(key+"thumb");
+  return `${THUMB_DIR}/${THUMBS[Math.floor(rng()*THUMBS.length)]}`;
+}
+
+// ---------- 발행일/수정일 ----------
+function fmtDate(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
+function fmtKor(d){ return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`; }
+function pageDates(key){
+  const rng = seedRng(key+"date");
+  const now = new Date();
+  const mod = new Date(now); mod.setDate(now.getDate()-Math.floor(rng()*14));
+  const pub = new Date(mod); pub.setDate(mod.getDate()-(30+Math.floor(rng()*150)));
+  return {published:pub, modified:mod, publishedStr:fmtDate(pub), modifiedStr:fmtDate(mod), publishedKor:fmtKor(pub), modifiedKor:fmtKor(mod)};
+}
 function schoolsFor(c,lv){ return lv==="초등"?c.e:(lv==="중등"?c.m:c.h); }
 function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 
@@ -100,16 +124,26 @@ function buildIndex(){
 // ---------- 레이아웃 ----------
 function layout({title,desc,canonical,jsonld,body,crumb}){
   const bc = crumb? `<nav class="bc">${crumb.map((c,i)=> c.url?`<a href="${c.url}">${esc(c.name)}</a>`:`<span>${esc(c.name)}</span>`).join(' <i>›</i> ')}</nav>`:"";
+  // 브레드크럼 JSON-LD (색인 최적화)
+  let bcLd = "";
+  if(crumb && crumb.length){
+    bcLd = JSON.stringify({"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":crumb.map((c,i)=>({"@type":"ListItem","position":i+1,"name":c.name,...(c.url?{"item":SITE_URL+c.url}:{})}))});
+  }
+  const ldBlocks = [jsonld, bcLd].filter(Boolean).map(j=>`<script type="application/ld+json">${j}</script>`).join("");
   return `<!DOCTYPE html><html lang="ko"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${esc(canonical)}">
 <meta property="og:type" content="website"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:site_name" content="${SITE_NAME}">
-${jsonld?`<script type="application/ld+json">${jsonld}</script>`:""}
+${ldBlocks}
 <style>${CSS}</style></head><body>
 <header class="hd"><div class="wrap"><a href="/" class="logo">세모<span>학원찾기</span></a><nav class="gnav"><a href="/regions">지역별</a></nav></div></header>
 <main class="wrap">${bc}${body}</main>
-<footer class="ft"><div class="wrap"><p class="ftname">${SITE_NAME}</p><p class="ftnote">전국 학원 정보를 지역·과목별로 안내하는 정보 제공 사이트입니다. 정확한 수업 시간 및 교습비는 지역별·과목별로 상이할 수 있으므로 각 학원에 방문상담을 통해 확인하시기 바랍니다.</p><p class="ftcopy">© ${SITE}</p></div></footer></body></html>`;
+<footer class="ft"><div class="wrap">
+<p class="ftname">${SITE_NAME}</p>
+<p class="ftlinks"><a href="/">홈</a> · <a href="/regions">전체 지역</a></p>
+<p class="ftnote">전국 학원 정보를 지역·과목별로 안내하는 정보 제공 사이트입니다. 정확한 수업 시간 및 교습비는 지역별·과목별로 상이할 수 있으므로 각 학원에 방문상담을 통해 확인하시기 바랍니다.</p>
+<p class="ftcopy">© ${SITE}</p></div></footer></body></html>`;
 }
 
 const CSS = `
@@ -127,6 +161,18 @@ main{padding:24px 20px 56px}
 .bc{font-size:13px;color:var(--sub);margin-bottom:16px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
 .bc a{color:var(--sub);text-decoration:none}.bc a:hover{color:var(--accent)}.bc i{color:#c3bdb2;font-style:normal}.bc span{color:var(--ink);font-weight:600}
 h1{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.28;margin-bottom:14px}
+/* 썸네일 */
+.thumb{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;margin-bottom:18px;background:linear-gradient(135deg,#2c6e63,#3a8576)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:repeating-linear-gradient(135deg,#2c6e63,#2c6e63 22px,#2f7468 22px,#2f7468 44px)}
+.thumb .ph span{color:rgba(255,255,255,.35);font-size:14px;font-weight:600}
+.thumb .overlay{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:24px;background:linear-gradient(to top,rgba(0,0,0,.55),rgba(0,0,0,.05) 55%,transparent)}
+.thumb .ttl{color:#fff;font-size:25px;font-weight:800;letter-spacing:-.6px;line-height:1.25;text-shadow:0 2px 8px rgba(0,0,0,.3)}
+.thumb .sub{color:rgba(255,255,255,.9);font-size:14px;font-weight:600;margin-top:5px;text-shadow:0 1px 5px rgba(0,0,0,.3)}
+/* 발행/수정일 */
+.dates{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--sub);margin:-4px 0 18px}
+.dates span{display:inline-flex;align-items:center;gap:5px}
+.dates b{font-weight:600;color:#4a525c}
 /* 상단 요약 카드 */
 .summary{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:22px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
 .summary .row{display:flex;flex-wrap:wrap;gap:10px 22px;margin-bottom:8px}
@@ -195,6 +241,9 @@ h1{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.28;margin-b
 /* footer */
 .ft{background:#262a30;color:#aeb4bd;margin-top:46px;padding:30px 0}
 .ftname{color:#fff;font-weight:700;font-size:15px;margin-bottom:9px}
+.ftlinks{font-size:13px;margin-bottom:11px}
+.ftlinks a{color:#cfd4db;text-decoration:none}
+.ftlinks a:hover{color:#fff;text-decoration:underline}
 .ftnote{font-size:12.5px;line-height:1.75;margin-bottom:10px;max-width:620px}
 .ftcopy{font-size:12px;color:#7d848e}
 @media(max-width:600px){h1{font-size:22px}.hero{padding:30px 22px}.hero h1{font-size:23px}main{padding:18px 16px 44px}.summary .row{gap:8px 16px}}
@@ -204,6 +253,10 @@ h1{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.28;margin-b
 function pageSubject(dong, subj, lv, chere){
   const {paras, schools, kw, kws, g, sgg} = genBody(dong, subj, lv, chere);
   const lead = paras[0][1];
+  const key = `${dong}|${subj}|${lv}`;
+  const dates = pageDates(key);
+  const thumb = thumbBlock(key, kw, `${sgg} ${dong}`);
+  const dateBar = `<div class="dates"><span>📅 발행일 <b>${dates.publishedKor}</b></span><span>🔄 수정일 <b>${dates.modifiedKor}</b></span></div>`;
   // 상단 요약
   const summary = `<div class="summary">
 <div class="row">
@@ -236,10 +289,18 @@ function pageSubject(dong, subj, lv, chere){
   const related = relatedChips(dong, subj, lv);
   const canonical = SITE_URL+urlPage(dong,subj,lv);
   const desc = `${sgg} ${dong} ${g} ${subj} 학원 정보. 인근 학교 내신 대비와 ${subj} 학습 관리 안내. 자세한 사항은 방문상담으로 확인하세요.`;
-  const jsonld = JSON.stringify({"@context":"https://schema.org","@type":"FAQPage","mainEntity":faqs.map(f=>({"@type":"Question","name":f[0],"acceptedAnswer":{"@type":"Answer","text":f[1]}}))});
-  const body = `<h1>${esc(kw)}</h1>${summary}${toc}${secs}${schoolTbl}${cards}${related}${faqHtml}<div class="note">정확한 수업 시간 및 교습비는 지역별·과목별로 상이할 수 있습니다. 자세한 사항은 각 학원에 방문상담을 통해 확인하시기 바랍니다.</div>`;
+  const jsonld = JSON.stringify({"@context":"https://schema.org","@type":"Article","headline":kw,"datePublished":dates.publishedStr,"dateModified":dates.modifiedStr,"author":{"@type":"Organization","name":SITE_NAME},"publisher":{"@type":"Organization","name":SITE_NAME},"mainEntityOfPage":canonical}) + "</script><script type=\"application/ld+json\">" + JSON.stringify({"@context":"https://schema.org","@type":"FAQPage","mainEntity":faqs.map(f=>({"@type":"Question","name":f[0],"acceptedAnswer":{"@type":"Answer","text":f[1]}}))});
+  const body = `${thumb}<h1>${esc(kw)}</h1>${dateBar}${summary}${toc}${secs}${schoolTbl}${cards}${related}${faqHtml}<div class="note">정확한 수업 시간 및 교습비는 지역별·과목별로 상이할 수 있습니다. 자세한 사항은 각 학원에 방문상담을 통해 확인하시기 바랍니다.</div>`;
   const crumb=[{name:"홈",url:"/"},{name:sgg,url:urlDong(dong)},{name:kw}];
   return layout({title:`${kw} | ${sgg} ${subj} 학원 정보`, desc, canonical, jsonld, body, crumb});
+}
+
+function thumbBlock(key, title, sub){
+  const src = thumbFor(key);
+  const inner = src
+    ? `<img src="${esc(src)}" alt="${esc(title)}" loading="eager">`
+    : `<div class="ph"><span>이미지 준비 중</span></div>`;
+  return `<div class="thumb">${inner}<div class="overlay"><div class="ttl">${esc(title)}</div>${sub?`<div class="sub">${esc(sub)}</div>`:""}</div></div>`;
 }
 
 function centerCard(c, lv){
@@ -275,7 +336,8 @@ function pageDong(dong, chere){
   const cards=`<section class="sec" id="list"><h2>${esc(dong)} 학원 목록</h2><div class="acards">${chere.map(c=>centerCard(c,"중등")).join("")}</div></section>`;
   const canonical=SITE_URL+urlDong(dong);
   const desc=`${sgg} ${dong} 학원 정보. ${dong} 지역 과목별·학년별 학원 안내와 인근 학교 내신 대비 정보를 확인하세요.`;
-  const body=`<h1>${esc(dong)} 학원 정보</h1>${summary}<section class="sec"><h2>${esc(dong)} 과목·학년별 학원</h2>${lvBlocks}</section>${cards}<div class="note">정확한 수업 시간 및 교습비는 각 학원에 방문상담을 통해 확인하시기 바랍니다.</div>`;
+  const thumb=thumbBlock(`dong|${dong}`, `${dong} 학원`, `${sido} ${sgg}`);
+  const body=`${thumb}<h1>${esc(dong)} 학원 정보</h1>${summary}<section class="sec"><h2>${esc(dong)} 과목·학년별 학원</h2>${lvBlocks}</section>${cards}<div class="note">정확한 수업 시간 및 교습비는 각 학원에 방문상담을 통해 확인하시기 바랍니다.</div>`;
   const crumb=[{name:"홈",url:"/"},{name:sido,url:urlRegion(sido)},{name:dong}];
   return layout({title:`${dong} 학원 | ${sgg} 과목별 학원 정보`, desc, canonical, jsonld:"", body, crumb});
 }
