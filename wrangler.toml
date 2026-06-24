@@ -1,0 +1,4 @@
+name = "semoacademy"
+main = "semoacademy_worker.js"
+compatibility_date = "2025-06-01"
+account_id = "3c78158a87642edead0262c804b16f58"
