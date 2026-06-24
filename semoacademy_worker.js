@@ -67,41 +67,250 @@ function urlPage(dong,subj,lv){ return `/${DONG_SLUG[dong]}/${LV_EN[lv]}-${SUBJ_
 function urlRegion(sido){ return `/region/${SIDO_SLUG[sido]||encodeURIComponent(sido)}`; }
 function urlCenter(id){ return `/center/${id}`; }
 
-// ---------- 본문 ----------
-function genBody(dong, subj, lv, chere){
-  const rng = seedRng(dong+subj+lv);
-  const g = LG[lv], kw = `${dong} ${lv}${subj}학원`, kws = `${dong} ${subj}학원`;
-  const sgg = chere[0].sgg;
-  let schools = []; chere.forEach(c=>{ schools = schools.concat(schoolsFor(c,lv)||[]); });
-  schools = [...new Set(schools)]; const s3 = schools.slice(0,3).join("·");
-  const co = CORE[subj], tp = TIP[subj], gl = LGL[lv];
-  const P = [];
-  const intros = [
-    `${J(kw,"을","를")} 찾고 계신 학부모님과 ${J(g,"을","를")} 위한 안내입니다. ${sgg} ${dong} 일대에서 ${subj} 과목을 체계적으로 관리받을 수 있는 학원 정보를 정리했습니다.`,
-    `${dong}에서 ${g} ${subj} 학원을 알아보고 계신가요? ${sgg} ${dong} 지역의 ${subj} 학습 환경과 ${kw} 정보를 안내해 드립니다.`,
-    `${sgg} ${dong}에 거주하는 ${J(g,"과","와")} 학부모님을 위해 ${kw} 정보를 모았습니다. ${dong}에서 ${subj} 과목을 꾸준히 관리받고 싶은 분들께 도움이 되는 내용입니다.`,
-    `${g}의 ${subj} 학습은 시기에 맞는 꾸준한 관리가 중요합니다. ${sgg} ${dong}에서 ${subj} 과목을 지도받을 수 있는 ${kw} 정보를 안내합니다.`];
-  let intro = pick(rng,intros);
-  if(s3){ const i2=[`${dong} 일대는 ${s3} 등 인근 학교 학생들이 많이 거주하는 지역으로, ${g}의 ${subj} 학습 수요가 꾸준한 곳입니다.`,`${dong} 주변에는 ${s3} 등이 있어 ${g}의 통학이 편리하며, 학교 일정에 맞춘 ${subj} 관리가 이루어지는 지역입니다.`,`${s3} 등이 가까운 ${J(dong,"은","는")} ${g} 자녀를 둔 가정이 ${subj} 학원을 찾을 때 통학 거리와 학교별 내신 관리를 함께 고려하는 지역입니다.`]; intro+=" "+pick(rng,i2); }
-  P.push(["lead", intro]);
-  const q1=[`${kws}, 어떤 기준으로 선택해야 하나요?`,`${kws} 선택 시 무엇을 봐야 할까요?`,`${dong}에서 ${subj}학원 고르는 기준`];
-  P.push([pick(rng,q1), `${g} 시기의 ${J(subj,"은","는")} ${J(co[0],"과","와")} ${J(co[1],"을","를")} 균형 있게 다지는 것이 중요합니다. ${dong}에서 ${subj}학원을 선택할 때는 학생 개개인의 현재 학습 수준을 정확히 진단하고, 부족한 부분을 채워 주는 수준별 맞춤 지도가 이루어지는지 살펴보는 것이 좋습니다. 또한 ${LGS[lv]}의 학습 흐름을 이해하고 초·중·고 연계학습으로 관리해 주는 곳일수록 장기적인 성취에 도움이 됩니다.`]);
-  P.push([`학년별 ${subj} 학습 방향`, `${gl[0]} 단계에서는 ${J(tp[0],"이","가")} 무엇보다 중요합니다. 이 시기에 기초를 탄탄히 다져 두면 이후 학습이 훨씬 수월해집니다. ${gl[1]} 단계로 올라가면 ${J(co[2],"을","를")} 강화하면서 ${J(tp[1],"을","를")} 병행하는 것이 좋습니다. ${DEEP[subj]} ${kw}에서는 학년과 수준에 따라 학습 목표를 다르게 설정하고, 학생이 무리 없이 다음 단계로 나아갈 수 있도록 단계별로 관리합니다.`]);
-  if(schools.length){ const sc=schools.slice(0,8).join("·"); P.push([`${dong} 인근 학교 내신 대비`, `${J(kws,"은","는")} ${sc} 등 인근 학교의 ${J(g,"을","를")} 대상으로, 학교별 진도와 시험 출제 경향에 맞춘 ${subj} 수업을 제공합니다. 같은 ${subj} 과목이라도 학교마다 시험 범위와 서술형 비중이 다르기 때문에, ${dong} 지역 학교 사정을 잘 아는 곳에서 관리받는 것이 내신 관리에 유리합니다. 시험 기간에는 학교별 기출 유형을 분석해 대비하고, 평소에는 학교 진도에 맞춰 예습과 복습을 병행합니다.`]); }
-  P.push([`${g} ${subj} 학습 관리 방식`, `${subj} 과목은 ${J(co[2],"을","를")} 단계적으로 쌓아 가는 과정이 필요합니다. ${kw}에서는 학생의 수준을 진단한 뒤 ${J(co[3],"을","를")} 포함한 영역별 학습 계획을 세우고, 매일의 학습을 점검하며 피드백합니다. 학습 플래너를 활용해 스스로 공부하는 습관을 기르고, ${tp[2]} 방식으로 실력을 다집니다. 수준별 맞춤 지도와 밀착 관리로 ${J(g,"이","가")} 꾸준히 학습량을 채워 갈 수 있도록 돕습니다.`]);
-  const env=[`${dong} 지역에서 ${subj} 학원을 선택할 때는 학습 분위기와 관리 시스템도 중요한 기준이 됩니다. 조용하고 집중할 수 있는 환경, 학생별 진도 관리, 정기적인 학습 상담이 이루어지는 곳일수록 꾸준한 학습이 가능합니다. 상담을 통해 자녀의 현재 수준과 학습 목표를 점검한 뒤 시작하면 시행착오를 줄일 수 있습니다.`,`${kws}를 알아볼 때는 학생의 수준을 먼저 진단하고 그에 맞는 학습 방향을 제안받는 것이 좋습니다. 정기적인 상담으로 학습 진행 상황을 공유하고, 가정과 학원이 함께 학생을 관리할 때 더 좋은 결과로 이어집니다. 처음 시작하는 학생이라면 방문상담을 통해 학습 계획을 함께 세워 보시기를 권합니다.`];
-  P.push([`학습 환경과 상담`, pick(rng,env)]);
-  P.push([`학습 코칭과 자기주도 학습`, `성적은 수업 시간만으로 오르지 않습니다. ${kws}에서는 ${J(g,"이","가")} 스스로 학습 계획을 세우고 실천하는 자기주도 학습 습관을 기를 수 있도록 코칭합니다. 매일 학습 플래너를 작성하고 점검하며, 부족한 부분은 반복 학습으로 보완합니다. 이러한 밀착 관리는 ${subj} 실력뿐 아니라 전반적인 학습 태도를 바로잡는 데에도 도움이 되어, ${g} 시기의 학습 자신감을 키우는 바탕이 됩니다.`]);
-  return {paras:P, schools, kw, kws, g, sgg};
+// ---------- 본문 엔진 v4 (유사도 최소화) ----------
+// 유사도 낮추며 글자수 늘리는 엔진 v3
+
+function shuffle(r,a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function some(r,a,n){ return shuffle(r,a).slice(0,n); }
+function sf(c,lv){ return lv==="초등"?c.e:(lv==="중등"?c.m:c.h); }
+const LGL2={"초등":["초등 3학년","초등 4학년","초등 5학년","초등 6학년"],"중등":["중학교 1학년","중학교 2학년","중학교 3학년"],"고등":["고등학교 1학년","고등학교 2학년","고등학교 3학년"]};
+
+const SUBJ = {
+ "영어":{core:["어휘","문법","독해","듣기","말하기","쓰기","서술형 영작","구문 분석","어법"],
+   focus:["기초 어휘를 다지고 문장 구조를 익히는","독해 지문을 정확히 해석하는","교과서 본문을 분석해 서술형에 대비하는","듣기와 말하기 감각을 기르는","문법 개념을 체계적으로 정리하는","긴 지문을 빠르게 읽어 내는"],
+   verb:["어휘력을 넓히고","독해 속도를 끌어올리고","문법을 탄탄히 다지고","서술형 답안 작성을 연습하고","교과서 본문을 깊이 분석하고","문장 구조를 파악하고"],
+   tip:["매일 일정 분량의 단어를 외우고 누적 점검하는 습관","지문을 끊어 읽으며 구조를 파악하는 연습","교과서 본문을 문장 단위로 분석하는 학습","오답을 어휘·문법·독해로 나눠 보완하는 방식"]},
+ "수학":{core:["개념","연산","응용","심화","오답 관리","서술형 풀이","단원 평가","사고력"],
+   focus:["개념을 정확히 이해하고 연산을 다지는","응용·심화 문제로 사고력을 키우는","오답을 분석해 약점을 보완하는","단원별 난이도를 단계적으로 높이는","서술형 풀이 과정을 점검하는","공식의 원리를 이해하는"],
+   verb:["개념을 스스로 설명해 보고","틀린 문제를 다시 풀어 보고","연산 정확도를 높이고","심화 문제에 도전하고","단원별로 약점을 메우고","풀이 과정을 점검하고"],
+   tip:["틀린 문제를 모아 다시 푸는 오답 노트 관리","개념을 말로 설명해 보며 이해를 확인하는 학습","쉬운 문제부터 단계적으로 난이도를 높이는 방식","풀이 과정을 서술해 논리를 점검하는 연습"]},
+ "국어":{core:["문학","비문학","어휘","문법","서술형","글쓰기","독해","화법"],
+   focus:["문학과 비문학 지문을 폭넓게 읽는","어휘력과 배경지식을 쌓는","교과서 지문을 중심으로 내신에 대비하는","글의 구조를 분석하는","서술형 답안을 연습하는","근거를 찾아 읽는"],
+   verb:["다양한 글을 읽고 요약하고","어휘를 정리하고","지문 구조를 분석하고","서술형 답안을 다듬고","배경지식을 넓히고","근거를 찾아 읽고"],
+   tip:["다양한 글을 읽고 핵심을 요약하는 훈련","어휘와 배경지식을 함께 정리하는 학습","교과서 지문을 중심으로 한 내신 대비","문단별 중심 내용을 파악하는 연습"]},
+ "과학":{core:["개념","원리","실험","탐구","단원 정리","문제 적용","그래프 해석"],
+   focus:["핵심 개념과 원리를 이해하는","실험과 탐구 과정을 익히는","단원별로 내용을 정리하는","개념을 실생활과 연결하는","문제 적용력을 기르는","그래프와 자료를 해석하는"],
+   verb:["개념을 도표로 정리하고","실험 과정을 이해하고","원리를 실생활과 연결하고","단원 평가로 점검하고","응용 문제를 풀어 보고","자료를 해석하고"],
+   tip:["개념을 그림과 도표로 정리하는 학습","실험 과정과 결과를 연결해 이해하는 방식","단원 평가 문제로 적용력을 점검하는 연습","원리를 실생활 사례와 연결하는 학습"]},
+ "사회":{core:["개념","흐름","맥락","자료 해석","사고력","시사","연표"],
+   focus:["개념과 흐름을 이해하는","자료와 그래프를 해석하는","사건의 맥락을 파악하는","생활 사례와 연결하는","사고력을 확장하는","연표로 흐름을 잡는"],
+   verb:["핵심 개념을 흐름으로 정리하고","자료 해석을 연습하고","사건의 배경을 이해하고","시사 사례와 연결하고","개념 간 관계를 파악하고","연표를 정리하고"],
+   tip:["핵심 개념을 흐름과 연표로 정리하는 학습","자료와 그래프를 해석하는 연습","생활 속 사례와 개념을 연결하는 방식","사건의 배경과 결과를 함께 정리하는 학습"]},
+};
+
+// 2문장짜리 섹션 생성기 (앞문장 + 뒷문장 각각 풀에서)
+function secCriteria(rng,ctx){
+  const {dong,subj,g,kws}=ctx; const sj=SUBJ[subj]; const c2=some(rng,sj.core,2).join("과 ");
+  const titles=[`${kws}, 어떤 기준으로 고를까요?`,`${dong} ${subj}학원 선택 포인트`,`${subj}학원, 무엇을 보고 정해야 할까`,`${g} ${subj}학원 고르는 법`,`${dong}에서 ${subj}학원 선택 시 체크할 점`];
+  const a=[
+    `${g} 시기의 ${subj}는 ${c2}을 균형 있게 다지는 것이 핵심입니다.`,
+    `${dong}에서 ${subj}학원을 고를 때는 ${pick(rng,sj.focus)} 관리가 이루어지는지가 중요합니다.`,
+    `${subj} 과목은 ${c2}이 바탕이 됩니다.`,
+    `좋은 ${subj}학원은 점수만 보지 않고 ${pick(rng,sj.focus)} 과정을 함께 설계합니다.`,
+  ];
+  const b=[
+    `학생마다 출발점이 다르므로, 현재 수준을 진단하고 약점을 채워 주는 곳인지 먼저 살펴보세요.`,
+    `${g}의 학습 습관까지 챙겨 주는 곳일수록 오래 다닐 수 있습니다.`,
+    `상담에서 학습 계획을 어떻게 세우는지 확인하면 선택에 도움이 됩니다.`,
+    `수준별로 지도하는지, 진도와 시험 대비를 어떻게 운영하는지 따져 보는 것이 좋습니다.`,
+  ];
+  const c=[`특히 ${pick(rng,sj.focus)} 부분을 꼼꼼히 봐 주는 곳이라면 더욱 좋습니다.`,`${pick(rng,sj.tip)}이 가능한지도 확인해 보면 도움이 됩니다.`,`수업 후 복습과 점검까지 이어지는지가 실력 차이를 만듭니다.`];
+  return {h:pick(rng,titles), p:pick(rng,a)+" "+pick(rng,b)+" "+pick(rng,c)};
+}
+function secGrade(rng,ctx){
+  const {subj,lv,kw}=ctx; const sj=SUBJ[subj]; const gl=LGL2[lv];
+  const g1=pick(rng,gl), g2=pick(rng,gl.filter(x=>x!==g1))||gl[gl.length-1];
+  const titles=[`학년별 ${subj} 학습 방향`,`${LG[lv]} ${subj}, 학년마다 다르게`,`${subj} 단계별 학습 포인트`,`학년에 맞춘 ${subj} 학습`];
+  const a=[
+    `${g1} 무렵에는 ${pick(rng,sj.verb)} 기초를 다지는 시기입니다.`,
+    `${subj}는 학년이 올라갈수록 ${pick(rng,sj.core)}의 비중이 커집니다.`,
+    `${g1}과 ${g2}는 학습 목표가 서로 다릅니다.`,
+  ];
+  const b=[
+    `${g2}로 올라가면 ${pick(rng,sj.focus)} 학습으로 무게가 옮겨 갑니다.`,
+    `앞 단계에서 ${pick(rng,sj.verb)} 토대를 만들어 두면 다음 단계가 수월합니다.`,
+    `${kw}에서는 학년과 수준에 맞춰 목표와 과제를 다르게 설정합니다.`,
+  ];
+  const c=[`${pick(rng,sj.tip)}을 통해 단계마다 빈틈을 메워 갑니다.`,`이 과정에서 ${pick(rng,sj.tip)}이 도움이 됩니다.`,``];
+  return {h:pick(rng,titles), p:[pick(rng,a),pick(rng,b),pick(rng,c)].filter(Boolean).join(" ")};
+}
+function secSchool(rng,ctx){
+  const {dong,subj,g,kws,schools}=ctx; if(!schools.length) return null;
+  const sc=shuffle(rng,schools).slice(0,8).join("·");
+  const titles=[`${dong} 인근 학교 내신 대비`,`${dong} 학교별 ${subj} 관리`,`${dong} 주변 학교 시험 대비`];
+  const a=[
+    `${J(kws,"은","는")} ${sc} 등의 ${g}을 대상으로 학교별 시험 범위에 맞춰 지도합니다.`,
+    `${sc} 같은 인근 학교는 ${subj} 시험 유형이 제각각입니다.`,
+    `${dong} 일대 ${sc} 등의 학사 일정에 맞춰 ${subj} 진도를 조절합니다.`,
+  ];
+  const b=[
+    `학교마다 출제 경향이 달라 지역 사정을 잘 아는 곳이 내신 관리에 유리합니다.`,
+    `시험 기간에는 학교별 기출을 분석해 집중적으로 대비합니다.`,
+    `평소에는 학교 진도에 맞춰 예습과 복습을 병행합니다.`,
+  ];
+  const c=[`내신 성적은 결국 학교 시험에 얼마나 맞춰 준비하느냐에 달려 있습니다.`,`${dong} 학교들의 출제 패턴을 알고 대비하면 좋은 결과로 이어집니다.`,`서술형 비중이 높아지는 만큼 답안 작성 연습도 함께 이루어집니다.`];
+  return {h:pick(rng,titles), p:pick(rng,a)+" "+pick(rng,b)+" "+pick(rng,c)};
+}
+function secManage(rng,ctx){
+  const {subj,g,kw}=ctx; const sj=SUBJ[subj];
+  const titles=[`${g} ${subj} 학습 관리`,`${subj} 실력을 쌓는 방법`,`${kw}의 관리 방식`,`꾸준한 ${subj} 관리`];
+  const a=[
+    `${subj}는 ${pick(rng,sj.verb)} 꾸준함이 쌓여야 실력으로 이어집니다.`,
+    `${kw}에서는 ${pick(rng,sj.focus)} 데 초점을 둡니다.`,
+    `성적은 한 번에 오르지 않습니다.`,
+  ];
+  const b=[
+    `학습 플래너로 매일을 점검하고, ${pick(rng,sj.tip)}으로 약점을 보완합니다.`,
+    `수준별로 과제를 다르게 주고 학습량을 조금씩 늘려 갑니다.`,
+    `${pick(rng,sj.tip)}을 반복하며 부족한 부분을 채워 갑니다.`,
+  ];
+  const c=[`작은 성취가 쌓이면 ${g}의 학습 자신감으로 이어집니다.`,`꾸준한 점검이 결국 ${subj} 성적의 바탕이 됩니다.`,`무리한 진도보다 정확한 이해를 우선하는 것이 오래갑니다.`];
+  return {h:pick(rng,titles), p:pick(rng,a)+" "+pick(rng,b)+" "+pick(rng,c)};
+}
+function secSelf(rng,ctx){
+  const {subj,g,dong}=ctx;
+  const titles=[`자기주도 학습 코칭`,`스스로 공부하는 습관`,`${dong}에서의 학습 코칭`,`학습 습관 만들기`];
+  const a=[
+    `좋은 학원은 답을 알려 주기보다 ${g}이 스스로 계획하고 실천하도록 돕습니다.`,
+    `${subj} 성적의 바탕은 자기주도 학습입니다.`,
+    `수업 시간만으로는 충분하지 않습니다.`,
+  ];
+  const b=[
+    `플래너 작성과 점검을 반복하며 ${subj} 학습 태도를 잡아 갑니다.`,
+    `매일 할 일을 정하고 점검받는 과정에서 ${g}은 공부하는 힘을 기릅니다.`,
+    `${g}이 집에서도 ${subj}를 이어 갈 수 있도록 습관과 동기를 함께 관리합니다.`,
+  ];
+  const c=[`스스로 공부하는 힘이 생기면 어느 과목이든 흔들리지 않습니다.`,`자기주도 습관은 ${g} 시기에 만들어 두면 평생 자산이 됩니다.`,`학원의 역할은 결국 학생이 혼자 설 수 있도록 돕는 것입니다.`];
+  return {h:pick(rng,titles), p:pick(rng,a)+" "+pick(rng,b)+" "+pick(rng,c)};
+}
+function secEnv(rng,ctx){
+  const {dong,subj}=ctx;
+  const titles=[`학습 환경과 상담`,`${dong} 학원 상담 안내`,`상담으로 시작하기`,`학원 분위기와 관리`];
+  const a=[
+    `${dong}에서 ${subj} 학원을 고를 때는 분위기와 관리 체계도 함께 봐야 합니다.`,
+    `처음이라면 방문상담으로 수준을 진단하고 학습 방향을 함께 정하는 것이 좋습니다.`,
+    `상담을 통해 아이의 현재 위치와 목표를 점검한 뒤 시작하면 시행착오를 줄일 수 있습니다.`,
+  ];
+  const b=[
+    `조용한 환경과 정기적인 상담이 있는 곳일수록 꾸준히 다닐 수 있습니다.`,
+    `가정과 학원이 함께 챙길 때 학습 효과가 높아집니다.`,
+    `학습 진행 상황을 정기적으로 공유받을 수 있는지 확인해 보세요.`,
+  ];
+  const c=[`상담만 받아 봐도 자녀에게 맞는 방향을 가늠할 수 있습니다.`,`부담 없이 문의해 학습 계획을 들어 보시기를 권합니다.`,`첫 상담에서 현재 수준과 목표를 명확히 하면 이후가 수월합니다.`];
+  return {h:pick(rng,titles), p:pick(rng,a)+" "+pick(rng,b)+" "+pick(rng,c)};
+}
+function secArea(rng,ctx){
+  const {dong,sgg,g,subj}=ctx;
+  const titles=[`${dong} 통학과 학부모 안내`,`${sgg} ${dong} 학습 환경`,`학부모님께 드리는 안내`];
+  const a=[
+    `${dong}에서 학원을 고를 때는 통학 거리와 안전도 함께 고려하게 됩니다.`,
+    `${g}의 ${subj} 학습은 학원과 가정의 관리가 함께 갈 때 효과가 큽니다.`,
+    `${sgg} ${dong}은 ${g}을 둔 가정이 많아 학원 선택의 폭이 비교적 넓습니다.`,
+  ];
+  const b=[
+    `가까운 거리에서 꾸준히 다닐 수 있는 곳일수록 학습의 연속성이 유지됩니다.`,
+    `통학 거리, 관리 방식, 상담 체계를 함께 살펴 자녀에게 맞는 곳을 고르세요.`,
+    `정기 상담으로 학습 상황을 공유받으며 가정에서의 습관 관리와 병행하면 좋습니다.`,
+  ];
+  return {h:pick(rng,titles), p:pick(rng,a)+" "+pick(rng,b)};
 }
 
-// FAQ 데이터
-function faqData(dong, subj, g){
-  return [
-    [`${dong}에서 ${g} ${subj}를 처음 시작해도 괜찮을까요?`, "학생의 현재 수준을 먼저 진단한 뒤 그에 맞는 단계부터 시작하기 때문에, 기초가 부족한 학생도 자신의 속도에 맞춰 학습할 수 있습니다."],
-    [`${subj} 외에 다른 과목도 함께 관리받을 수 있나요?`, "학원에 따라 여러 과목을 함께 관리하는 경우도 있으므로, 자세한 사항은 방문상담 시 확인하실 수 있습니다."],
-    ["수업 시간과 교습비는 어떻게 되나요?", "수업 시간과 교습비는 지역별·과목별로 다를 수 있으며, 학생의 학습 상황에 따라 달라집니다. 자세한 사항은 방문상담을 통해 안내받으실 수 있습니다."]
+function secIntro(rng,ctx){
+  const {dong,subj,g,kw,sgg,schools}=ctx; const s3=schools.slice(0,3).join("·");
+  const a=[
+    `${J(kw,"을","를")} 찾고 계신가요?`,`${sgg} ${dong}에 사는 ${g}과 학부모님을 위한 안내입니다.`,
+    `${dong}에서 ${g}의 ${subj} 학습을 고민하고 계신다면 도움이 될 정보입니다.`,
+    `${g}의 ${subj} 실력을 키우려면 꾸준한 관리가 필요합니다.`,`${dong} 일대의 ${subj} 학습 환경과 학원 정보를 정리했습니다.`];
+  const b=[
+    `${sgg} ${dong}에서 ${subj} 과목을 관리받을 수 있는 학원 정보를 모았습니다.`,
+    `이 지역에서 ${g} ${subj}를 시작하려는 분들께 참고가 될 내용입니다.`,
+    `${dong}의 ${subj} 학원 선택에 도움이 되도록 핵심만 정리했습니다.`];
+  const c=[ s3?`${dong} 주변에는 ${s3} 등이 있어 ${g}의 통학이 어렵지 않습니다.`:"",
+    s3?`${s3} 등 인근 학교 학생들이 많이 찾는 지역입니다.`:"",
+    `이 지역은 학원을 고를 때 통학 거리와 내신 관리를 함께 살피는 곳입니다.`].filter(Boolean);
+  return [pick(rng,a),pick(rng,b),pick(rng,c)].join(" ");
+}
+
+
+function secGradeDetail(rng,ctx){
+  const {dong,subj,lv,chere}=ctx;
+  // 이 동에서 해당 과목 가능한 학년 전부 수집
+  let grades=[]; chere.forEach(c=>{ if(c.subj[subj]) grades=grades.concat(c.subj[subj]); });
+  grades=[...new Set(grades)];
+  const map={"초등":"초등","중등":"중학","고등":"고교"};
+  const gtxt=grades.map(x=>map[x]).join("·");
+  const titles=[`${dong} ${subj} 수업 가능 범위`,`${dong}에서 들을 수 있는 ${subj}`,`${subj} 지도 가능 학년`];
+  const a=[
+    `${dong} 지역 학원에서는 ${gtxt} 과정의 ${subj} 수업이 가능합니다.`,
+    `현재 ${dong}에서는 ${gtxt} 단계의 ${subj}를 지도하고 있습니다.`,
+    `${dong} 학원의 ${subj} 수업은 ${gtxt} 과정을 대상으로 합니다.`,
   ];
+  const b=[
+    `학년과 수준에 따라 반과 진도가 나뉘므로, 자녀의 단계에 맞는 수업을 상담받을 수 있습니다.`,
+    `같은 ${subj}라도 학년별로 다루는 내용이 달라 단계에 맞춘 선택이 중요합니다.`,
+    `자녀의 현재 학년과 학습 상태에 맞춰 수업을 안내받으시면 됩니다.`,
+  ];
+  return {h:pick(rng,titles), p:pick(rng,a)+" "+pick(rng,b)};
+}
+function secCombo(rng,ctx){
+  const {dong,subj,chere}=ctx;
+  let allsubj=new Set(); chere.forEach(c=>{ Object.keys(c.subj).forEach(s=>allsubj.add(s)); });
+  const others=[...allsubj].filter(s=>s!==subj);
+  if(!others.length) return null;
+  const otxt=others.join("·");
+  const titles=[`${dong}에서 함께 관리 가능한 과목`,`${subj} 외 과목 안내`,`다과목 관리`];
+  const a=[
+    `${dong} 지역 학원에서는 ${subj} 외에 ${otxt} 과목도 함께 관리하는 경우가 있습니다.`,
+    `${subj}와 더불어 ${otxt}까지 한 곳에서 관리받고 싶다면 ${dong} 학원을 살펴보세요.`,
+    `${dong}에서는 ${subj}를 포함해 ${otxt} 등 여러 과목을 병행할 수 있습니다.`,
+  ];
+  const b=[
+    `여러 과목을 한 곳에서 관리하면 학습 일정을 통합해 효율적으로 운영할 수 있습니다.`,
+    `과목별 지도 가능 여부는 학원마다 다르므로 상담 시 확인하시면 됩니다.`,
+    `주력 과목과 보조 과목을 함께 설계하면 전체 성적 관리에 도움이 됩니다.`,
+  ];
+  return {h:pick(rng,titles), p:pick(rng,a)+" "+pick(rng,b)};
+}
+
+
+function secFaq(rng,ctx){
+  const {dong,subj,g,kws}=ctx; const sj=SUBJ[subj];
+  const q1a=[`${dong}에서 ${g} ${subj}를 처음 시작해도 괜찮을까요?`,`${subj}를 늦게 시작해도 따라갈 수 있을까요?`,`기초가 부족한데 ${subj} 수업을 들어도 될까요?`];
+  const q1b=[`현재 수준을 진단한 뒤 맞는 단계부터 시작하므로 기초가 부족해도 자신의 속도로 학습할 수 있습니다.`,`출발점을 정확히 파악해 시작하기 때문에 늦은 시작도 충분히 따라갈 수 있습니다.`,`기초 단계부터 차근차근 다지면 부족한 부분을 메우며 실력을 쌓을 수 있습니다.`];
+  const q2a=[`${dong} ${subj}학원은 어떻게 수업이 진행되나요?`,`수업은 어떤 방식으로 운영되나요?`,`${subj} 수업 방식이 궁금합니다.`];
+  const q2b=[`${pick(rng,sj.focus)} 방식으로 진행되며, 학생 수준에 따라 진도와 과제가 조절됩니다.`,`수준별로 ${pick(rng,sj.verb)} 매일 학습을 점검하는 방식으로 운영됩니다.`,`${pick(rng,sj.tip)}을 중심으로 단계적으로 진행됩니다.`];
+  const q3a=[`수업 시간과 교습비는 어떻게 되나요?`,`비용과 시간이 궁금합니다.`];
+  const q3b=[`지역과 과목, 학습 상황에 따라 다르므로 방문상담을 통해 안내받으실 수 있습니다.`,`수업 시간과 교습비는 학원·과목별로 상이하니 상담 시 확인하시면 됩니다.`];
+  return {h:`자주 묻는 질문`, p:`Q. ${pick(rng,q1a)}\n${pick(rng,q1b)}\nQ. ${pick(rng,q2a)}\n${pick(rng,q2b)}\nQ. ${pick(rng,q3a)}\n${pick(rng,q3b)}`};
+}
+
+
+function secTip(rng,ctx){
+  const {subj,g,dong}=ctx; const sj=SUBJ[subj];
+  const ts=some(rng,sj.tip,2);
+  const titles=[`${g} ${subj} 공부법`,`집에서 할 수 있는 ${subj} 학습`,`${subj} 실력 올리는 습관`];
+  const a=[
+    `${subj}는 학원 수업과 함께 평소 습관이 중요합니다.`,
+    `꾸준한 ${subj} 실력은 작은 습관에서 시작됩니다.`,
+    `${g}이 ${subj}에서 성과를 내려면 일상의 학습 루틴이 받쳐 줘야 합니다.`,
+  ];
+  return {h:pick(rng,titles), p:pick(rng,a)+` 예를 들어 ${ts[0]}, 그리고 ${ts[1]}이 도움이 됩니다. ${dong} 학원에서도 이러한 학습 습관을 함께 잡아 갑니다.`};
+}
+
+function genBody(dong,subj,lv,chere){
+  const rng=seedRng(dong+subj+lv+"v3");
+  const g=LG[lv], kw=`${dong} ${lv}${subj}학원`, kws=`${dong} ${subj}학원`;
+  const sgg=chere[0].sgg;
+  let schools=[]; chere.forEach(c=>{ schools=schools.concat(sf(c,lv)||[]); }); schools=[...new Set(schools)];
+  const ctx={dong,subj,lv,g,kw,kws,sgg,schools,chere};
+  const lead=secIntro(rng,ctx);
+  let pool=[secCriteria,secGrade,secGradeDetail,secSchool,secManage,secCombo,secSelf,secTip,secEnv,secArea].map(f=>f(rng,ctx)).filter(Boolean);
+  pool=shuffle(rng,pool);
+  const faq=secFaq(rng,ctx);
+  const closeA=[`${sgg} ${dong}에서 ${g} ${subj} 학원을 찾고 계시다면 위 정보를 참고하시기 바랍니다.`,`${dong}에서 ${subj} 학원을 비교해 보고 계신다면 도움이 되었기를 바랍니다.`,`${dong} ${subj} 학원 선택에 위 내용이 참고가 되길 바랍니다.`];
+  const closeB=[`정확한 수업 시간과 교습비는 지역·과목별로 다를 수 있으므로 각 학원에 방문상담으로 확인하시기 바랍니다.`,`자세한 운영 방식과 비용은 방문상담을 통해 안내받으시기 바랍니다.`];
+  const close={h:`${dong} ${subj}학원 안내를 마치며`, p:pick(rng,closeA)+" "+pick(rng,closeB)};
+  return {lead, secs:[...pool,faq,close], schools, kw, kws, g, sgg};
 }
 
 // ---------- 인덱스 ----------
@@ -251,13 +460,12 @@ h1{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.28;margin-b
 
 // ---------- 페이지: 동+과목+대상 ----------
 function pageSubject(dong, subj, lv, chere){
-  const {paras, schools, kw, kws, g, sgg} = genBody(dong, subj, lv, chere);
-  const lead = paras[0][1];
+  const gen = genBody(dong, subj, lv, chere);
+  const lead = gen.lead, schools = gen.schools, kw = gen.kw, kws = gen.kws, g = gen.g, sgg = gen.sgg;
   const key = `${dong}|${subj}|${lv}`;
   const dates = pageDates(key);
   const thumb = thumbBlock(key, kw, `${sgg} ${dong}`);
   const dateBar = `<div class="dates"><span>📅 발행일 <b>${dates.publishedKor}</b></span><span>🔄 수정일 <b>${dates.modifiedKor}</b></span></div>`;
-  // 상단 요약
   const summary = `<div class="summary">
 <div class="row">
 <span class="item">📍 지역<b>${esc(sgg)} ${esc(dong)}</b></span>
@@ -267,11 +475,11 @@ function pageSubject(dong, subj, lv, chere){
 </div>
 <div class="badges">${schools.slice(0,6).map(s=>`<span class="badge">🏫 ${esc(s)}</span>`).join("")}</div>
 <p class="lead">${esc(lead)}</p></div>`;
-  // 목차
-  const secList = paras.slice(1);
-  const toc = `<div class="toc"><h2>이 페이지에서 다루는 내용</h2><ul>${secList.map((p,i)=>`<li><a href="#s${i}">${esc(p[0])}</a></li>`).join("")}<li><a href="#schools">인근 학교 정리</a></li><li><a href="#list">학원 안내</a></li><li><a href="#faq">자주 묻는 질문</a></li></ul></div>`;
-  // 섹션들
-  const secs = secList.map((p,i)=>`<section class="sec" id="s${i}"><h2>${esc(p[0])}</h2><p>${esc(p[1])}</p></section>`).join("");
+  // FAQ 섹션 분리 (아코디언으로), 나머지는 일반 섹션
+  const faqSec = gen.secs.find(s=>s.h==="자주 묻는 질문");
+  const textSecs = gen.secs.filter(s=>s.h!=="자주 묻는 질문");
+  const toc = `<div class="toc"><h2>이 페이지에서 다루는 내용</h2><ul>${textSecs.map((s,i)=>`<li><a href="#s${i}">${esc(s.h)}</a></li>`).join("")}<li><a href="#schools">인근 학교</a></li><li><a href="#list">학원 안내</a></li><li><a href="#faq">자주 묻는 질문</a></li></ul></div>`;
+  const secs = textSecs.map((s,i)=>`<section class="sec" id="s${i}"><h2>${esc(s.h)}</h2><p style="white-space:pre-line">${esc(s.p)}</p></section>`).join("");
   // 학교 표
   let schoolTbl = "";
   if(schools.length){
@@ -280,19 +488,26 @@ function pageSubject(dong, subj, lv, chere){
     const rows = Object.keys(byType).map(t=>{ const u=[...new Set(byType[t])]; return u.length?`<tr><th>${t}</th><td>${u.map(esc).join(", ")}</td></tr>`:""; }).join("");
     schoolTbl = `<section class="sec" id="schools"><h2>${esc(dong)} 인근 학교</h2><p class="subt">${esc(dong)} 지역 학원이 관리하는 인근 학교 목록입니다.</p><table class="schooltbl">${rows}</table></section>`;
   }
-  // 학원 카드
   const cards = `<section class="sec" id="list"><h2>${esc(dong)} ${esc(subj)} 학원 안내</h2><div class="acards">${chere.map(c=>centerCard(c,lv)).join("")}</div></section>`;
-  // FAQ
-  const faqs = faqData(dong,subj,g);
-  const faqHtml = `<section class="sec" id="faq"><h2>자주 묻는 질문</h2><div class="faq">${faqs.map(f=>`<details><summary><span class="q">Q. ${esc(f[0])}</span></summary><div class="a">${esc(f[1])}</div></details>`).join("")}</div></section>`;
-  // 관련 링크
+  // FAQ 파싱 (Q./답 줄 형식 → 배열)
+  const faqs = parseFaq(faqSec ? faqSec.p : "");
+  const faqHtml = faqs.length ? `<section class="sec" id="faq"><h2>자주 묻는 질문</h2><div class="faq">${faqs.map(f=>`<details><summary><span class="q">Q. ${esc(f[0])}</span></summary><div class="a">${esc(f[1])}</div></details>`).join("")}</div></section>` : "";
   const related = relatedChips(dong, subj, lv);
   const canonical = SITE_URL+urlPage(dong,subj,lv);
   const desc = `${sgg} ${dong} ${g} ${subj} 학원 정보. 인근 학교 내신 대비와 ${subj} 학습 관리 안내. 자세한 사항은 방문상담으로 확인하세요.`;
-  const jsonld = JSON.stringify({"@context":"https://schema.org","@type":"Article","headline":kw,"datePublished":dates.publishedStr,"dateModified":dates.modifiedStr,"author":{"@type":"Organization","name":SITE_NAME},"publisher":{"@type":"Organization","name":SITE_NAME},"mainEntityOfPage":canonical}) + "</script><script type=\"application/ld+json\">" + JSON.stringify({"@context":"https://schema.org","@type":"FAQPage","mainEntity":faqs.map(f=>({"@type":"Question","name":f[0],"acceptedAnswer":{"@type":"Answer","text":f[1]}}))});
+  const faqLd = faqs.length ? "</script><script type=\"application/ld+json\">"+JSON.stringify({"@context":"https://schema.org","@type":"FAQPage","mainEntity":faqs.map(f=>({"@type":"Question","name":f[0],"acceptedAnswer":{"@type":"Answer","text":f[1]}}))}) : "";
+  const jsonld = JSON.stringify({"@context":"https://schema.org","@type":"Article","headline":kw,"datePublished":dates.publishedStr,"dateModified":dates.modifiedStr,"author":{"@type":"Organization","name":SITE_NAME},"publisher":{"@type":"Organization","name":SITE_NAME},"mainEntityOfPage":canonical}) + faqLd;
   const body = `${thumb}<h1>${esc(kw)}</h1>${dateBar}${summary}${toc}${secs}${schoolTbl}${cards}${related}${faqHtml}<div class="note">정확한 수업 시간 및 교습비는 지역별·과목별로 상이할 수 있습니다. 자세한 사항은 각 학원에 방문상담을 통해 확인하시기 바랍니다.</div>`;
   const crumb=[{name:"홈",url:"/"},{name:sgg,url:urlDong(dong)},{name:kw}];
   return layout({title:`${kw} | ${sgg} ${subj} 학원 정보`, desc, canonical, jsonld, body, crumb});
+}
+
+function parseFaq(text){
+  // "Q. 질문\n답\nQ. 질문2\n답2" → [[q,a],...]
+  const out=[]; const lines=text.split("\n"); let q=null;
+  for(const ln of lines){ if(ln.startsWith("Q.")){ if(q)out.push([q.q,q.a]); q={q:ln.slice(2).trim(),a:""}; } else if(q){ q.a += (q.a?" ":"")+ln.trim(); } }
+  if(q)out.push([q.q,q.a]);
+  return out;
 }
 
 function thumbBlock(key, title, sub){
