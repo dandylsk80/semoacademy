@@ -2,7 +2,11 @@ const CENTERS = [{"id": 1, "dong": "덕풍동", "sgg": "하남시", "name": "하
 const DONG_SLUG = {"가경동": "gagyeong-dong", "갈매동": "galmae-dong", "갈산동": "galsan-dong", "개신동": "gaesin-dong", "거의동": "geoui-dong", "고잔동": "gojan-dong", "관저동": "gwanjeo-dong", "관평동": "gwanpyeong-dong", "광명동": "gwangmyeong-dong", "교동": "gyo-dong", "구갈동": "gugal-dong", "구월동": "guwol-dong", "구의동": "guui-dong", "국우동": "gugu-dong", "금곡동": "geumgok-dong", "금암동": "geumam-dong", "금촌동": "geumchon-dong", "남가좌동": "namgajwa-dong", "남외동": "namoe-dong", "노형동": "nohyeong-dong", "논현동": "nonhyeon-dong", "다산동": "dasan-dong", "단구동": "dangu-dong", "단대동": "dandae-dong", "당산동5가": "dangsandong5ga", "대야동": "daeya-dong", "덕이동": "deogi-dong", "덕풍동": "deokpung-dong", "도안동": "doan-dong", "돈암동": "donam-dong", "동백동": "dongbaek-dong", "동소문동7가": "dongsomundong7ga", "동천동": "dongcheon-dong", "동춘동": "dongchun-dong", "동패동": "dongpae-dong", "두정동": "dujeong-dong", "두호동": "duho-dong", "둔산동": "dunsan-dong", "마곡동": "magok-dong", "만촌동": "manchon-dong", "망월동": "mangwol-dong", "망포동": "mangpo-dong", "매탄동": "maetan-dong", "명일동": "myeongil-dong", "목동": "mok-dong", "목동동": "mokdong-dong", "무실동": "musil-dong", "미아동": "mia-dong", "반곡동": "bangok-dong", "반송동": "bansong-dong", "반여동": "banyeo-dong", "배곧동": "baegot-dong", "별내동": "byeolnae-dong", "병점동": "byeongjeom-dong", "보라동": "bora-dong", "복대동": "bokdae-dong", "복산동": "boksan-dong", "복현동": "bokhyeon-dong", "봉담읍": "bongdameup", "봉무동": "bongmu-dong", "봉산동": "bongsan-dong", "부발읍": "bubaleup", "부평동": "bupyeong-dong", "북변동": "bukbyeon-dong", "불당동": "buldang-dong", "비산동": "bisan-dong", "비전동": "bijeon-dong", "사동": "sa-dong", "사직동": "sajik-dong", "산남동": "sannam-dong", "산본동": "sanbon-dong", "산척동": "sancheok-dong", "삼산동": "samsan-dong", "상남동": "sangnam-dong", "상동": "sang-dong", "상암동": "sangam-dong", "상현동": "sanghyeon-dong", "새롬동": "saerom-dong", "서신동": "seosin-dong", "석동": "seok-dong", "석사동": "seoksa-dong", "선암동": "seonam-dong", "성남동": "seongnam-dong", "성사동": "seongsa-dong", "소사본동": "sosabon-dong", "소하동": "soha-dong", "송도동": "songdo-dong", "송정동": "songjeong-dong", "송천동1가": "songcheondong1ga", "송촌동": "songchon-dong", "수성동2가": "suseongdong2ga", "수완동": "suwan-dong", "수월동": "suwol-dong", "수창동": "suchang-dong", "수청동": "sucheong-dong", "시지동": "siji-dong", "시흥동": "siheung-dong", "신곡동": "singok-dong", "신길동": "singil-dong", "신도림동": "sindorim-dong", "신방동": "sinbang-dong", "신봉동": "sinbong-dong", "신정동": "sinjeong-dong", "신창동": "sinchang-dong", "신현동": "sinhyeon-dong", "쌍용동": "ssangyong-dong", "양덕동": "yangdeok-dong", "양지읍": "yangjieup", "여수동": "yeosu-dong", "역북동": "yeokbuk-dong", "역촌동": "yeokchon-dong", "염리동": "yeomri-dong", "염창동": "yeomchang-dong", "영덕동": "yeongdeok-dong", "영천동": "yeongcheon-dong", "영통동": "yeongtong-dong", "오산동": "osan-dong", "옥계동": "okgye-dong", "옥길동": "okgil-dong", "옥정동": "okjeong-dong", "온천동": "oncheon-dong", "와동동": "wadong-dong", "용강동": "yonggang-dong", "용두동": "yongdu-dong", "용산동": "yongsan-dong", "운양동": "unyang-dong", "원흥동": "wonheung-dong", "월계동": "wolgye-dong", "월성동": "wolseong-dong", "유천동": "yucheon-dong", "율하동": "yulha-dong", "읍내동": "eupnae-dong", "이곡동": "igok-dong", "이매동": "imae-dong", "이서면": "iseomyeon", "이충동": "ichung-dong", "인창동": "inchang-dong", "일산동": "ilsan-dong", "장곡동": "janggok-dong", "장기동": "janggi-dong", "장지동": "jangji-dong", "장항동": "janghang-dong", "조남동": "jonam-dong", "종암동": "jongam-dong", "좌동": "jwa-dong", "주엽동": "juyeop-dong", "중동": "jung-dong", "중산동": "jungsan-dong", "지족동": "jijok-dong", "진관동": "jingwan-dong", "진안동": "jinan-dong", "진월동": "jinwol-dong", "진접읍": "jinjeobeup", "창곡동": "changgok-dong", "천천동": "cheoncheon-dong", "철산동": "cheolsan-dong", "청라동": "cheongra-dong", "치평동": "chipyeong-dong", "칠금동": "chilgeum-dong", "침산동": "chimsan-dong", "탄벌동": "tanbeol-dong", "탄현동": "tanhyeon-dong", "탕정면": "tangjeongmyeon", "태평동": "taepyeong-dong", "퇴계원읍": "toegyewoneup", "평내동": "pyeongnae-dong", "풍덕천동": "pungdeokcheon-dong", "풍동": "pung-dong", "풍산동": "pungsan-dong", "하계동": "hagye-dong", "행신동": "haengsin-dong", "향남읍": "hyangnameup", "호매실동": "homaesil-dong", "호평동": "hopyeong-dong", "화명동": "hwamyeong-dong", "화정동": "hwajeong-dong", "후평동": "hupyeong-dong"};// ===== semoacademy.com Worker v2 =====
 const SITE = "semoacademy.com";
 const SITE_URL = "https://semoacademy.com";
-const SITE_NAME = "세모학원찾기";
+const SITE_NAME = "세상의 모든학원";
+const PHONE = "010-9876-8282";
+const PHONE_TEL = "01098768282";
+// 문의 저장용 Apps Script 웹앱 주소 (배포 후 여기에 붙여넣기)
+const INQUIRY_ENDPOINT = ""; // 예: "https://script.google.com/macros/s/AKfy.../exec"
 
 // 슬러그 역매핑
 let _slug2dong = null;
@@ -344,27 +348,83 @@ function buildIndex(){
 // ---------- 레이아웃 ----------
 function layout({title,desc,canonical,jsonld,body,crumb}){
   const bc = crumb? `<nav class="bc">${crumb.map((c,i)=> c.url?`<a href="${c.url}">${esc(c.name)}</a>`:`<span>${esc(c.name)}</span>`).join(' <i>›</i> ')}</nav>`:"";
-  // 브레드크럼 JSON-LD (색인 최적화)
+  // 브레드크럼 JSON-LD
   let bcLd = "";
   if(crumb && crumb.length){
     bcLd = JSON.stringify({"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":crumb.map((c,i)=>({"@type":"ListItem","position":i+1,"name":c.name,...(c.url?{"item":SITE_URL+c.url}:{})}))});
   }
-  const ldBlocks = [jsonld, bcLd].filter(Boolean).map(j=>`<script type="application/ld+json">${j}</script>`).join("");
+  // 조직 + 로고 JSON-LD (구글·네이버 로고 노출용)
+  const orgLd = JSON.stringify({"@context":"https://schema.org","@type":"Organization","name":SITE_NAME,"url":SITE_URL,"logo":SITE_URL+"/logo.png","telephone":"+82-10-9876-8282"});
+  const ldBlocks = [jsonld, bcLd, orgLd].filter(Boolean).map(j=>`<script type="application/ld+json">${j}</script>`).join("");
   return `<!DOCTYPE html><html lang="ko"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${esc(canonical)}">
-<meta property="og:type" content="website"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:site_name" content="${SITE_NAME}">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/logo.png">
+<meta property="og:type" content="website"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:site_name" content="${SITE_NAME}"><meta property="og:image" content="${SITE_URL}/logo.png">
 ${ldBlocks}
 <style>${CSS}</style></head><body>
-<header class="hd"><div class="wrap"><a href="/" class="logo">세모<span>학원찾기</span></a><nav class="gnav"><a href="/regions">지역별</a></nav></div></header>
+<header class="hd"><div class="wrap"><a href="/" class="logo">${LOGO_SVG}<span class="logotxt">세상의 모든학원</span></a><nav class="gnav"><a href="/regions">지역별</a><a href="tel:${PHONE_TEL}" class="gnav-call">📞 ${PHONE}</a></nav></div></header>
 <main class="wrap">${bc}${body}</main>
 <footer class="ft"><div class="wrap">
-<p class="ftname">${SITE_NAME}</p>
-<p class="ftlinks"><a href="/">홈</a> · <a href="/regions">전체 지역</a></p>
+<p class="ftname">${LOGO_SVG_SM} ${SITE_NAME}</p>
+<p class="ftlinks"><a href="/">홈</a> · <a href="/regions">전체 지역</a> · <a href="tel:${PHONE_TEL}">전화문의 ${PHONE}</a></p>
 <p class="ftnote">전국 학원 정보를 지역·과목별로 안내하는 정보 제공 사이트입니다. 정확한 수업 시간 및 교습비는 지역별·과목별로 상이할 수 있으므로 각 학원에 방문상담을 통해 확인하시기 바랍니다.</p>
-<p class="ftcopy">© ${SITE}</p></div></footer></body></html>`;
+<p class="ftcopy">© ${SITE}</p></div></footer>
+${FLOATING}
+${INQUIRY_MODAL}
+<script>${INQUIRY_JS}</script>
+</body></html>`;
 }
+
+// 로고 SVG (둥근 사각 + 흰 세모)
+const LOGO_SVG = `<svg class="logoimg" width="32" height="32" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2c6e63"/><stop offset="1" stop-color="#3a8576"/></linearGradient></defs><rect width="40" height="40" rx="11" fill="url(#lg)"/><polygon points="20,10 32,30 8,30" fill="#fff"/><polygon points="20,17 27,30 13,30" fill="#2c6e63" opacity="0.28"/></svg>`;
+const LOGO_SVG_SM = `<svg width="20" height="20" viewBox="0 0 40 40" style="vertical-align:-4px"><rect width="40" height="40" rx="11" fill="#3a8576"/><polygon points="20,10 32,30 8,30" fill="#fff"/></svg>`;
+
+// 플로팅 버튼 (전화/문자/문의)
+const FLOATING = `<div class="floating">
+<a href="tel:${PHONE_TEL}" class="fbtn fcall" aria-label="전화"><span class="fic">📞</span><span class="flbl">전화</span></a>
+<a href="sms:${PHONE_TEL}" class="fbtn fsms" aria-label="문자"><span class="fic">💬</span><span class="flbl">문자</span></a>
+<button class="fbtn finq" onclick="openInq()" aria-label="문의"><span class="fic">✉️</span><span class="flbl">문의</span></button>
+</div>`;
+
+// 문의 모달
+const INQUIRY_MODAL = `<div class="inqback" id="inqBack" onclick="if(event.target===this)closeInq()">
+<div class="inqbox">
+<button class="inqx" onclick="closeInq()" aria-label="닫기">×</button>
+<h3>문의 남기기</h3>
+<p class="inqdesc">아래 내용을 남겨 주시면 빠르게 안내해 드립니다.</p>
+<div class="inqfield"><label>이름</label><input id="iqName" type="text" placeholder="성함"></div>
+<div class="inqfield"><label>연락처</label><input id="iqPhone" type="tel" placeholder="010-0000-0000"></div>
+<div class="inqfield"><label>지역·과목</label><input id="iqArea" type="text" placeholder="예: 덕풍동 중등영어"></div>
+<div class="inqfield"><label>문의 내용</label><textarea id="iqMsg" rows="3" placeholder="궁금하신 점을 적어 주세요"></textarea></div>
+<button class="inqsubmit" onclick="submitInq()">문의 보내기</button>
+<a href="tel:${PHONE_TEL}" class="inqcall">📞 바로 전화하기 ${PHONE}</a>
+<p class="inqnote" id="iqNote"></p>
+</div></div>`;
+
+// 문의 JS
+const INQUIRY_JS = `
+function openInq(){document.getElementById('inqBack').style.display='flex';}
+function closeInq(){document.getElementById('inqBack').style.display='none';}
+async function submitInq(){
+  var n=document.getElementById('iqName').value.trim();
+  var p=document.getElementById('iqPhone').value.trim();
+  var a=document.getElementById('iqArea').value.trim();
+  var m=document.getElementById('iqMsg').value.trim();
+  var note=document.getElementById('iqNote');
+  if(!n||!p){note.style.color='#c0392b';note.textContent='이름과 연락처를 입력해 주세요.';return;}
+  note.style.color='#5b636e';note.textContent='전송 중...';
+  var endpoint=${JSON.stringify(INQUIRY_ENDPOINT)};
+  var payload={name:n,phone:p,area:a,message:m,page:location.href,time:new Date().toLocaleString('ko-KR')};
+  if(!endpoint){note.style.color='#c0392b';note.textContent='문의 접수 준비 중입니다. 전화로 문의해 주세요.';return;}
+  try{
+    await fetch(endpoint,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+    note.style.color='#2c6e63';note.textContent='문의가 접수되었습니다. 곧 연락드리겠습니다.';
+    document.getElementById('iqName').value='';document.getElementById('iqPhone').value='';document.getElementById('iqArea').value='';document.getElementById('iqMsg').value='';
+  }catch(e){ note.style.color='#c0392b';note.textContent='전송에 실패했습니다. 전화로 문의해 주세요.'; }
+}`;
 
 const CSS = `
 :root{--bg:#f7f6f3;--ink:#21262c;--sub:#616a75;--line:#e6e2da;--accent:#2c6e63;--accent-d:#22564d;--soft:#eef4f2;--card:#fff;--warn-bg:#fff8ee;--warn-bd:#f3e2c4;--warn-ink:#7a5a24}
@@ -373,21 +433,58 @@ body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;b
 .wrap{max-width:880px;margin:0 auto;padding:0 20px}
 .hd{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
 .hd .wrap{display:flex;align-items:center;justify-content:space-between;height:58px}
-.logo{font-size:20px;font-weight:800;color:var(--accent);text-decoration:none;letter-spacing:-.5px}
-.logo span{color:var(--ink)}
+.logo{font-size:20px;font-weight:800;color:var(--accent);text-decoration:none;letter-spacing:-.5px;display:flex;align-items:center;gap:8px}
+.logo .logoimg{flex-shrink:0}
+.logo .logotxt{color:var(--ink);font-weight:800}
+.gnav{display:flex;align-items:center;gap:16px}
 .gnav a{color:var(--sub);text-decoration:none;font-size:14.5px;font-weight:600}
 .gnav a:hover{color:var(--accent)}
+.gnav-call{color:var(--accent)!important;font-weight:700!important}
+@media(max-width:600px){.gnav-call{display:none}}
+/* 플로팅 버튼 */
+.floating{position:fixed;right:16px;bottom:20px;display:flex;flex-direction:column;gap:10px;z-index:50}
+.fbtn{width:58px;height:58px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.18);transition:transform .12s}
+.fbtn:hover{transform:scale(1.06)}
+.fbtn .fic{font-size:20px;line-height:1}
+.fbtn .flbl{font-size:10px;font-weight:700;margin-top:2px}
+.fcall{background:#e8633a;color:#fff}
+.fsms{background:#3a8576;color:#fff}
+.finq{background:#2c6e63;color:#fff}
+@media(max-width:600px){.fbtn{width:52px;height:52px}.fbtn .fic{font-size:18px}}
+/* 문의 모달 */
+.inqback{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:60;align-items:center;justify-content:center;padding:20px}
+.inqbox{background:#fff;border-radius:16px;padding:26px 24px;max-width:400px;width:100%;position:relative;max-height:90vh;overflow-y:auto}
+.inqx{position:absolute;top:14px;right:16px;background:none;border:none;font-size:24px;color:#aaa;cursor:pointer;line-height:1}
+.inqbox h3{font-size:19px;font-weight:800;margin-bottom:5px}
+.inqdesc{font-size:13.5px;color:var(--sub);margin-bottom:16px}
+.inqfield{margin-bottom:12px}
+.inqfield label{display:block;font-size:13px;font-weight:600;color:#4a525c;margin-bottom:5px}
+.inqfield input,.inqfield textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:14.5px;font-family:inherit;background:var(--bg)}
+.inqfield input:focus,.inqfield textarea:focus{outline:none;border-color:var(--accent)}
+.inqsubmit{width:100%;background:#e8633a;color:#fff;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px}
+.inqsubmit:hover{background:#d4552e}
+.inqcall{display:block;text-align:center;margin-top:10px;padding:11px;border:1px solid var(--accent);border-radius:10px;color:var(--accent);text-decoration:none;font-size:14.5px;font-weight:700}
+.inqnote{font-size:13px;text-align:center;margin-top:10px;min-height:18px}
+/* 페이지 내 문의 CTA 박스 */
+.cta{background:linear-gradient(135deg,#2c6e63,#3a8576);border-radius:14px;padding:22px 24px;margin:26px 0;color:#fff;text-align:center}
+.cta h2{color:#fff;font-size:18px;font-weight:800;margin-bottom:6px;border:none;padding:0}
+.cta h2::before{display:none}
+.cta p{color:#d6ebe6;font-size:14px;margin-bottom:14px}
+.cta .ctabtns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.cta a,.cta button{padding:12px 22px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;border:none;cursor:pointer}
+.cta .cphone{background:#fff;color:var(--accent)}
+.cta .cinq{background:#e8633a;color:#fff}
 main{padding:24px 20px 56px}
 .bc{font-size:13px;color:var(--sub);margin-bottom:16px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
 .bc a{color:var(--sub);text-decoration:none}.bc a:hover{color:var(--accent)}.bc i{color:#c3bdb2;font-style:normal}.bc span{color:var(--ink);font-weight:600}
 h1{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.28;margin-bottom:14px}
 /* 썸네일 */
-.thumb{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;margin-bottom:18px;background:linear-gradient(135deg,#2c6e63,#3a8576)}
+.thumb{position:relative;width:100%;aspect-ratio:24/9;max-height:240px;border-radius:14px;overflow:hidden;margin-bottom:18px;background:linear-gradient(135deg,#2c6e63,#3a8576)}
 .thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .thumb .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:repeating-linear-gradient(135deg,#2c6e63,#2c6e63 22px,#2f7468 22px,#2f7468 44px)}
 .thumb .ph span{color:rgba(255,255,255,.35);font-size:14px;font-weight:600}
-.thumb .overlay{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:24px;background:linear-gradient(to top,rgba(0,0,0,.55),rgba(0,0,0,.05) 55%,transparent)}
-.thumb .ttl{color:#fff;font-size:25px;font-weight:800;letter-spacing:-.6px;line-height:1.25;text-shadow:0 2px 8px rgba(0,0,0,.3)}
+.thumb .overlay{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:18px 22px;background:linear-gradient(to top,rgba(0,0,0,.55),rgba(0,0,0,.05) 60%,transparent)}
+.thumb .ttl{color:#fff;font-size:22px;font-weight:800;letter-spacing:-.6px;line-height:1.25;text-shadow:0 2px 8px rgba(0,0,0,.3)}
 .thumb .sub{color:rgba(255,255,255,.9);font-size:14px;font-weight:600;margin-top:5px;text-shadow:0 1px 5px rgba(0,0,0,.3)}
 /* 발행/수정일 */
 .dates{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--sub);margin:-4px 0 18px}
@@ -475,6 +572,10 @@ h1{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.28;margin-b
 .hero .stat{display:flex;gap:26px;margin-top:20px}
 .hero .stat div{font-size:13px;color:#bfdcd5}
 .hero .stat b{display:block;font-size:22px;color:#fff;font-weight:800}
+.herobtns{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.herobtns a,.herobtns button{padding:12px 22px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;border:none;cursor:pointer}
+.herobtns .hcall{background:#fff;color:var(--accent)}
+.herobtns .hinq{background:#e8633a;color:#fff}
 /* note */
 .note{background:var(--warn-bg);border:1px solid var(--warn-bd);color:var(--warn-ink);border-radius:11px;padding:13px 17px;font-size:13.5px;margin:22px 0 0;line-height:1.6}
 .subt{font-size:13px;color:var(--sub);margin:-6px 0 18px}
@@ -525,11 +626,12 @@ function pageSubject(dong, subj, lv, chere){
   const faqs = parseFaq(faqSec ? faqSec.p : "");
   const faqHtml = faqs.length ? `<section class="sec" id="faq"><h2>자주 묻는 질문</h2><div class="faq">${faqs.map(f=>`<details><summary><span class="q">Q. ${esc(f[0])}</span></summary><div class="a">${esc(f[1])}</div></details>`).join("")}</div></section>` : "";
   const related = relatedChips(dong, subj, lv);
+  const cta = `<div class="cta"><h2>${esc(dong)} ${esc(subj)} 학원, 더 알아보고 싶으신가요?</h2><p>전화 또는 문의 남기기로 ${esc(g)} ${esc(subj)} 학습 상담을 받아보세요.</p><div class="ctabtns"><a class="cphone" href="tel:${PHONE_TEL}">📞 ${PHONE}</a><button class="cinq" onclick="openInq()">✉️ 문의 남기기</button></div></div>`;
   const canonical = SITE_URL+urlPage(dong,subj,lv);
   const desc = `${sgg} ${dong} ${g} ${subj} 학원 정보. 인근 학교 내신 대비와 ${subj} 학습 관리 안내. 자세한 사항은 방문상담으로 확인하세요.`;
   const faqLd = faqs.length ? "</script><script type=\"application/ld+json\">"+JSON.stringify({"@context":"https://schema.org","@type":"FAQPage","mainEntity":faqs.map(f=>({"@type":"Question","name":f[0],"acceptedAnswer":{"@type":"Answer","text":f[1]}}))}) : "";
   const jsonld = JSON.stringify({"@context":"https://schema.org","@type":"Article","headline":kw,"datePublished":dates.publishedStr,"dateModified":dates.modifiedStr,"author":{"@type":"Organization","name":SITE_NAME},"publisher":{"@type":"Organization","name":SITE_NAME},"mainEntityOfPage":canonical}) + faqLd;
-  const body = `${thumb}<h1>${esc(kw)}</h1>${dateBar}${summary}${toc}${secs}${schoolTbl}${cards}${related}${faqHtml}<div class="note">정확한 수업 시간 및 교습비는 지역별·과목별로 상이할 수 있습니다. 자세한 사항은 각 학원에 방문상담을 통해 확인하시기 바랍니다.</div>`;
+  const body = `${thumb}<h1>${esc(kw)}</h1>${dateBar}${summary}${toc}${secs}${schoolTbl}${cards}${cta}${related}${faqHtml}<div class="note">정확한 수업 시간 및 교습비는 지역별·과목별로 상이할 수 있습니다. 자세한 사항은 각 학원에 방문상담을 통해 확인하시기 바랍니다.</div>`;
   const crumb=[{name:"홈",url:"/"},{name:sgg,url:urlDong(dong)},{name:kw}];
   return layout({title:`${kw} | ${sgg} ${subj} 학원 정보`, desc, canonical, jsonld, body, crumb});
 }
@@ -633,7 +735,7 @@ function pageHome(){
   const totalCenter=CENTERS.length;
   const grid=sidos.map(sido=>{ const dongCnt=Object.values(idx.bySido[sido]).reduce((s,x)=>s+x.size,0); return `<a href="${urlRegion(sido)}">${esc(sido)}<small>${dongCnt}개 지역</small></a>`; }).join("");
   const canonical=SITE_URL+"/";
-  const body=`<div class="hero"><h1>우리 동네 학원 정보,<br>세모학원찾기</h1><p>전국 지역별·과목별 학원 정보를 한곳에서. 동네 이름으로 우리 아이에게 맞는 학원을 찾아보세요.</p><div class="stat"><div><b>${totalCenter}</b>등록 학원</div><div><b>${totalDong}</b>동네</div><div><b>${sidos.length}</b>시·도</div></div></div>
+  const body=`<div class="hero"><h1>우리 동네 학원 정보,<br>세상의 모든학원</h1><p>전국 지역별·과목별 학원 정보를 한곳에서. 동네 이름으로 우리 아이에게 맞는 학원을 찾아보세요.</p><div class="stat"><div><b>${totalCenter}</b>등록 학원</div><div><b>${totalDong}</b>동네</div><div><b>${sidos.length}</b>시·도</div></div><div class="herobtns"><a class="hcall" href="tel:${PHONE_TEL}">📞 ${PHONE}</a><button class="hinq" onclick="openInq()">✉️ 문의하기</button></div></div>
 <section class="sec"><h2>지역으로 찾기</h2><p class="subt">시·도를 선택하면 시군구·동네별 학원 정보를 볼 수 있습니다.</p><div class="lgrid">${grid}</div></section>
 <div class="note">전국 학원 정보를 지역·과목별로 안내합니다. 정확한 수업 시간 및 교습비는 각 학원에 방문상담을 통해 확인하시기 바랍니다.</div>`;
   return layout({title:`${SITE_NAME} | 전국 지역별·과목별 학원 정보`, desc:"전국 지역별·과목별 학원 정보를 한곳에서. 동네 이름으로 우리 아이에게 맞는 영어·수학·국어·과학·사회 학원을 찾아보세요.", canonical, jsonld:"", body});
@@ -670,6 +772,10 @@ function sitemap(){
   return new Response(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u=>`<url><loc>${u}</loc></url>`).join("\n")}\n</urlset>`,{headers:{"content-type":"application/xml; charset=utf-8"}});
 }
 function robots(){ return new Response(`User-agent: *\nAllow: /\nSitemap: ${SITE_URL}/sitemap.xml\n`,{headers:{"content-type":"text/plain"}}); }
+function faviconSvg(){
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2c6e63"/><stop offset="1" stop-color="#3a8576"/></linearGradient></defs><rect width="40" height="40" rx="9" fill="url(#g)"/><polygon points="20,10 32,30 8,30" fill="#fff"/><polygon points="20,17 27,30 13,30" fill="#2c6e63" opacity="0.28"/></svg>`;
+  return new Response(svg,{headers:{"content-type":"image/svg+xml","cache-control":"public, max-age=86400"}});
+}
 function html(s){ return new Response(s,{headers:{"content-type":"text/html; charset=utf-8","cache-control":"public, max-age=3600"}}); }
 function notFound(){ return new Response(layout({title:`페이지를 찾을 수 없습니다 | ${SITE_NAME}`,desc:"",canonical:SITE_URL+"/",jsonld:"",body:`<h1>페이지를 찾을 수 없습니다</h1><p class="subt">요청하신 페이지가 없습니다. <a href="/" style="color:var(--accent)">홈으로 돌아가기</a></p>`}),{status:404,headers:{"content-type":"text/html; charset=utf-8"}}); }
 
@@ -680,6 +786,8 @@ async function handle(request){
   if(path==="/") return html(pageHome());
   if(path==="/robots.txt") return robots();
   if(path==="/sitemap.xml") return sitemap();
+  if(path==="/favicon.svg") return faviconSvg();
+  if(path==="/favicon.ico") return faviconSvg();
   if(path==="/regions") return html(pageRegions());
   const idx=buildIndex();
   // /region/:sido
