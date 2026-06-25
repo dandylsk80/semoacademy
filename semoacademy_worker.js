@@ -840,7 +840,7 @@ ${itemXml}
 </channel></rss>`;
   return new Response(xml,{headers:{"content-type":"application/rss+xml; charset=utf-8"}});
 }
-function robots(){ return new Response(`User-agent: *\nAllow: /\nSitemap: ${SITE_URL}/sitemap.xml\n`,{headers:{"content-type":"text/plain"}}); }
+function robots(){ return new Response(`User-agent: *\nAllow: /\nSitemap: ${SITE_URL}/sitemap.xml\n#DaumWebMasterTool:c644f4dc02b011738d6d5e1a90f02f3de7b52139c45d0e5115443b8c5f558b4e:oNr+BPWqeDif3frZUZg4VA==\n`,{headers:{"content-type":"text/plain"}}); }
 function faviconSvg(){
   const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2c6e63"/><stop offset="1" stop-color="#3a8576"/></linearGradient></defs><rect width="40" height="40" rx="9" fill="url(#g)"/><polygon points="20,10 32,30 8,30" fill="#fff"/><polygon points="20,17 27,30 13,30" fill="#2c6e63" opacity="0.28"/></svg>`;
   return new Response(svg,{headers:{"content-type":"image/svg+xml","cache-control":"public, max-age=86400"}});
