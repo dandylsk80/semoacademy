@@ -394,11 +394,23 @@ const INQUIRY_MODAL = `<div class="inqback" id="inqBack" onclick="if(event.targe
 <div class="inqbox">
 <button class="inqx" onclick="closeInq()" aria-label="닫기">×</button>
 <h3>문의 남기기</h3>
-<p class="inqdesc">아래 내용을 남겨 주시면 빠르게 안내해 드립니다.</p>
-<div class="inqfield"><label>이름</label><input id="iqName" type="text" placeholder="성함"></div>
-<div class="inqfield"><label>연락처</label><input id="iqPhone" type="tel" placeholder="010-0000-0000"></div>
-<div class="inqfield"><label>지역·과목</label><input id="iqArea" type="text" placeholder="예: 덕풍동 중등영어"></div>
-<div class="inqfield"><label>문의 내용</label><textarea id="iqMsg" rows="3" placeholder="궁금하신 점을 적어 주세요"></textarea></div>
+<p class="inqdesc">아래 내용을 남겨 주시면 빠르게 안내해 드립니다. (문의내용 외 모두 필수)</p>
+<div class="inqfield"><label>학생 이름 <em>*</em></label><input id="iqName" type="text" placeholder="학생 성함"></div>
+<div class="inqfield"><label>연락처 <em>*</em></label><input id="iqPhone" type="tel" placeholder="010-0000-0000"></div>
+<div class="inqfield"><label>주소 (도로명) <em>*</em></label><input id="iqAddr" type="text" placeholder="예: 경기 하남시 덕풍동로 119"></div>
+<div class="inqrow">
+<div class="inqfield"><label>학년 <em>*</em></label><select id="iqGrade">
+<option value="">선택</option>
+<option>초1</option><option>초2</option><option>초3</option><option>초4</option><option>초5</option><option>초6</option>
+<option>중1</option><option>중2</option><option>중3</option>
+<option>고1</option><option>고2</option><option>고3</option>
+</select></div>
+<div class="inqfield"><label>과목 <em>*</em></label><select id="iqSubject">
+<option value="">선택</option>
+<option>국어</option><option>영어</option><option>수학</option><option>과학</option><option>사회</option>
+</select></div>
+</div>
+<div class="inqfield"><label>문의 내용</label><textarea id="iqMsg" rows="3" placeholder="궁금하신 점을 적어 주세요 (선택)"></textarea></div>
 <button class="inqsubmit" onclick="submitInq()">문의 보내기</button>
 <a href="tel:${PHONE_TEL}" class="inqcall">📞 바로 전화하기 ${PHONE}</a>
 <p class="inqnote" id="iqNote"></p>
@@ -409,20 +421,23 @@ const INQUIRY_JS = `
 function openInq(){document.getElementById('inqBack').style.display='flex';}
 function closeInq(){document.getElementById('inqBack').style.display='none';}
 async function submitInq(){
-  var n=document.getElementById('iqName').value.trim();
-  var p=document.getElementById('iqPhone').value.trim();
-  var a=document.getElementById('iqArea').value.trim();
-  var m=document.getElementById('iqMsg').value.trim();
+  var name=document.getElementById('iqName').value.trim();
+  var phone=document.getElementById('iqPhone').value.trim();
+  var addr=document.getElementById('iqAddr').value.trim();
+  var grade=document.getElementById('iqGrade').value;
+  var subject=document.getElementById('iqSubject').value;
+  var msg=document.getElementById('iqMsg').value.trim();
   var note=document.getElementById('iqNote');
-  if(!n||!p){note.style.color='#c0392b';note.textContent='이름과 연락처를 입력해 주세요.';return;}
+  if(!name||!phone||!addr||!grade||!subject){note.style.color='#c0392b';note.textContent='문의내용을 제외한 모든 항목을 입력해 주세요.';return;}
   note.style.color='#5b636e';note.textContent='전송 중...';
   var endpoint=${JSON.stringify(INQUIRY_ENDPOINT)};
-  var payload={name:n,phone:p,area:a,message:m,page:location.href,time:new Date().toLocaleString('ko-KR')};
+  var payload={name:name,phone:phone,address:addr,grade:grade,subject:subject,message:msg,page:location.href,time:new Date().toLocaleString('ko-KR')};
   if(!endpoint){note.style.color='#c0392b';note.textContent='문의 접수 준비 중입니다. 전화로 문의해 주세요.';return;}
   try{
     await fetch(endpoint,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
     note.style.color='#2c6e63';note.textContent='문의가 접수되었습니다. 곧 연락드리겠습니다.';
-    document.getElementById('iqName').value='';document.getElementById('iqPhone').value='';document.getElementById('iqArea').value='';document.getElementById('iqMsg').value='';
+    ['iqName','iqPhone','iqAddr','iqMsg'].forEach(function(id){document.getElementById(id).value='';});
+    document.getElementById('iqGrade').value='';document.getElementById('iqSubject').value='';
   }catch(e){ note.style.color='#c0392b';note.textContent='전송에 실패했습니다. 전화로 문의해 주세요.'; }
 }`;
 
@@ -459,8 +474,11 @@ body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;b
 .inqdesc{font-size:13.5px;color:var(--sub);margin-bottom:16px}
 .inqfield{margin-bottom:12px}
 .inqfield label{display:block;font-size:13px;font-weight:600;color:#4a525c;margin-bottom:5px}
-.inqfield input,.inqfield textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:14.5px;font-family:inherit;background:var(--bg)}
-.inqfield input:focus,.inqfield textarea:focus{outline:none;border-color:var(--accent)}
+.inqfield label em{color:#e8633a;font-style:normal;margin-left:2px}
+.inqfield input,.inqfield textarea,.inqfield select{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:14.5px;font-family:inherit;background:var(--bg)}
+.inqfield input:focus,.inqfield textarea:focus,.inqfield select:focus{outline:none;border-color:var(--accent)}
+.inqrow{display:flex;gap:10px}
+.inqrow .inqfield{flex:1}
 .inqsubmit{width:100%;background:#e8633a;color:#fff;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px}
 .inqsubmit:hover{background:#d4552e}
 .inqcall{display:block;text-align:center;margin-top:10px;padding:11px;border:1px solid var(--accent);border-radius:10px;color:var(--accent);text-decoration:none;font-size:14.5px;font-weight:700}
