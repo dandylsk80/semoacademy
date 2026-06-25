@@ -805,9 +805,39 @@ function sitemap(){
   const idx=buildIndex(); const urls=[`${SITE_URL}/`,`${SITE_URL}/regions`];
   Object.keys(idx.bySido).forEach(s=>urls.push(SITE_URL+urlRegion(s)));
   Object.keys(idx.byDong).forEach(d=>urls.push(SITE_URL+urlDong(d)));
-  Object.keys(idx.pages).forEach(k=>{ const [d,s,l]=k.split("|"); urls.push(SITE_URL+urlPage(d,s,l)); });
+  const dated=[];
+  Object.keys(idx.pages).forEach(k=>{ const [d,s,l]=k.split("|"); const dt=pageDates(k); dated.push({loc:SITE_URL+urlPage(d,s,l),mod:dt.modifiedStr}); });
   CENTERS.forEach(c=>urls.push(SITE_URL+urlCenter(c.id)));
-  return new Response(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u=>`<url><loc>${u}</loc></url>`).join("\n")}\n</urlset>`,{headers:{"content-type":"application/xml; charset=utf-8"}});
+  const plain=urls.map(u=>`<url><loc>${u}</loc></url>`).join("\n");
+  const withDate=dated.map(x=>`<url><loc>${x.loc}</loc><lastmod>${x.mod}</lastmod></url>`).join("\n");
+  return new Response(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${plain}\n${withDate}\n</urlset>`,{headers:{"content-type":"application/xml; charset=utf-8"}});
+}
+function rss(){
+  const idx=buildIndex();
+  // 최근 수정일 기준 정렬해서 상위 50개
+  const items=[];
+  Object.keys(idx.pages).forEach(k=>{
+    const [d,s,l]=k.split("|"); const dt=pageDates(k);
+    items.push({d,s,l,loc:SITE_URL+urlPage(d,s,l),mod:dt.modified,modStr:dt.modifiedStr,title:`${d} ${l}${s}학원`});
+  });
+  items.sort((a,b)=>b.mod-a.mod);
+  const top=items.slice(0,50);
+  const now=new Date().toUTCString();
+  const itemXml=top.map(it=>{
+    const pub=new Date(it.mod).toUTCString();
+    const desc=`${it.d} 지역 ${it.title} 정보. 인근 학교 내신 대비와 학습 관리 안내.`;
+    return `<item><title>${esc(it.title)}</title><link>${it.loc}</link><guid>${it.loc}</guid><pubDate>${pub}</pubDate><description>${esc(desc)}</description></item>`;
+  }).join("\n");
+  const xml=`<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel>
+<title>${SITE_NAME}</title>
+<link>${SITE_URL}</link>
+<description>전국 지역별·과목별 학원 정보</description>
+<language>ko</language>
+<lastBuildDate>${now}</lastBuildDate>
+${itemXml}
+</channel></rss>`;
+  return new Response(xml,{headers:{"content-type":"application/rss+xml; charset=utf-8"}});
 }
 function robots(){ return new Response(`User-agent: *\nAllow: /\nSitemap: ${SITE_URL}/sitemap.xml\n`,{headers:{"content-type":"text/plain"}}); }
 function faviconSvg(){
@@ -824,6 +854,7 @@ async function handle(request){
   if(path==="/") return html(pageHome());
   if(path==="/robots.txt") return robots();
   if(path==="/sitemap.xml") return sitemap();
+  if(path==="/rss.xml"||path==="/rss"||path==="/feed") return rss();
   if(path==="/favicon.svg") return faviconSvg();
   if(path==="/favicon.ico") return faviconSvg();
   if(path==="/regions") return html(pageRegions());
