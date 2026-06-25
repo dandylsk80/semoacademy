@@ -366,6 +366,7 @@ function layout({title,desc,canonical,jsonld,body,crumb}){
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${esc(canonical)}">
+<meta name="naver-site-verification" content="2d9a9391a355be8594029617bfd31e90ca1f9fcc" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="apple-touch-icon" href="/logo.png">
 <meta property="og:type" content="website"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:site_name" content="${SITE_NAME}"><meta property="og:image" content="${SITE_URL}/logo.png">
