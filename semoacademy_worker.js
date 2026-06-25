@@ -114,8 +114,14 @@ function secCriteria(rng,ctx){
     `상담에서 학습 계획을 어떻게 세우는지 확인하면 선택에 도움이 됩니다.`,
     `수준별로 지도하는지, 진도와 시험 대비를 어떻게 운영하는지 따져 보는 것이 좋습니다.`,
   ];
-  const c=[`특히 ${pick(rng,sj.focus)} 부분을 꼼꼼히 봐 주는 곳이라면 더욱 좋습니다.`,`${pick(rng,sj.tip)}이 가능한지도 확인해 보면 도움이 됩니다.`,`수업 후 복습과 점검까지 이어지는지가 실력 차이를 만듭니다.`];
-  return {h:pick(rng,titles), p:pick(rng,a)+" "+pick(rng,b)+" "+pick(rng,c)};
+  const checks=[
+    `학생 개개인의 현재 수준을 진단하고 약점을 채워 주는가`,
+    `${pick(rng,sj.focus)} 관리가 이루어지는가`,
+    `학교별 진도와 시험 대비를 어떻게 운영하는가`,
+    `수업 후 복습과 점검까지 이어지는가`,
+    `${g}의 학습 습관까지 함께 챙겨 주는가`,
+  ];
+  return {h:pick(rng,titles), type:"check", p:pick(rng,a)+" "+pick(rng,b), items:some(rng,checks,4)};
 }
 function secGrade(rng,ctx){
   const {subj,lv,kw}=ctx; const sj=SUBJ[subj]; const gl=LGL2[lv];
@@ -132,7 +138,12 @@ function secGrade(rng,ctx){
     `${kw}에서는 학년과 수준에 맞춰 목표와 과제를 다르게 설정합니다.`,
   ];
   const c=[`${pick(rng,sj.tip)}을 통해 단계마다 빈틈을 메워 갑니다.`,`이 과정에서 ${pick(rng,sj.tip)}이 도움이 됩니다.`,``];
-  return {h:pick(rng,titles), p:[pick(rng,a),pick(rng,b),pick(rng,c)].filter(Boolean).join(" ")};
+  const steps=[
+    {t:`${g1} 단계`, d:`${pick(rng,sj.verb)} 기초를 다집니다.`},
+    {t:`${g2} 단계`, d:`${pick(rng,sj.focus)} 학습으로 넓혀 갑니다.`},
+    {t:`심화·정리`, d:`${pick(rng,sj.tip)}으로 빈틈을 메웁니다.`},
+  ];
+  return {h:pick(rng,titles), type:"step", p:[pick(rng,a),pick(rng,b)].join(" "), steps};
 }
 function secSchool(rng,ctx){
   const {dong,subj,g,kws,schools}=ctx; if(!schools.length) return null;
@@ -250,7 +261,7 @@ function secGradeDetail(rng,ctx){
     `같은 ${subj}라도 학년별로 다루는 내용이 달라 단계에 맞춘 선택이 중요합니다.`,
     `자녀의 현재 학년과 학습 상태에 맞춰 수업을 안내받으시면 됩니다.`,
   ];
-  return {h:pick(rng,titles), p:pick(rng,a)+" "+pick(rng,b)};
+  return {h:pick(rng,titles), type:"info", p:pick(rng,a)+" "+pick(rng,b)};
 }
 function secCombo(rng,ctx){
   const {dong,subj,chere}=ctx;
@@ -294,7 +305,7 @@ function secTip(rng,ctx){
     `꾸준한 ${subj} 실력은 작은 습관에서 시작됩니다.`,
     `${g}이 ${subj}에서 성과를 내려면 일상의 학습 루틴이 받쳐 줘야 합니다.`,
   ];
-  return {h:pick(rng,titles), p:pick(rng,a)+` 예를 들어 ${ts[0]}, 그리고 ${ts[1]}이 도움이 됩니다. ${dong} 학원에서도 이러한 학습 습관을 함께 잡아 갑니다.`};
+  return {h:pick(rng,titles), type:"box", p:pick(rng,a), items:[ts[0], ts[1], pick(rng,sj.tip)]};
 }
 
 function genBody(dong,subj,lv,chere){
@@ -398,9 +409,30 @@ h1{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.28;margin-b
 .toc a:hover{color:var(--accent);text-decoration:underline}
 /* 섹션 */
 .sec{margin:0 0 26px;scroll-margin-top:70px}
-.sec h2{font-size:18.5px;font-weight:700;color:var(--ink);margin-bottom:10px;letter-spacing:-.3px;display:flex;align-items:center;gap:8px}
-.sec h2::before{content:"";width:4px;height:18px;background:var(--accent);border-radius:3px;display:inline-block}
+.sec h2{font-size:18.5px;font-weight:700;color:var(--ink);margin-bottom:10px;letter-spacing:-.3px;display:flex;align-items:center;gap:7px}
+.sec h2 .sicon{font-size:17px}
 .sec p{font-size:15px;color:#3a4149;margin-bottom:8px}
+/* 체크리스트 */
+.checklist{list-style:none;margin:10px 0 2px;display:grid;gap:8px}
+.checklist li{position:relative;padding:10px 14px 10px 38px;background:#fff;border:1px solid var(--line);border-radius:10px;font-size:14.5px;color:#3a4149}
+.checklist li::before{content:"✓";position:absolute;left:13px;top:50%;transform:translateY(-50%);width:18px;height:18px;background:var(--accent);color:#fff;border-radius:50%;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700}
+/* 스텝 */
+.steps{display:grid;gap:10px;margin:12px 0 2px}
+.step{display:flex;gap:13px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:11px;padding:13px 16px}
+.stepnum{flex-shrink:0;width:26px;height:26px;background:var(--soft);color:var(--accent-d);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px}
+.stepbody{display:flex;flex-direction:column;gap:2px}
+.stepbody b{font-size:14.5px;color:var(--ink)}
+.stepbody span{font-size:14px;color:var(--sub)}
+/* 포인트 박스 */
+.pointbox{background:var(--soft);border-radius:12px;padding:15px 18px;margin:10px 0 2px}
+.pbtitle{font-size:12.5px;font-weight:700;color:var(--accent-d);margin-bottom:8px;letter-spacing:.3px}
+.pointbox ul{list-style:none;display:grid;gap:6px}
+.pointbox li{position:relative;padding-left:20px;font-size:14.5px;color:#3a4149}
+.pointbox li::before{content:"›";position:absolute;left:6px;color:var(--accent);font-weight:700}
+/* 인포 섹션 (배경 강조) */
+.infosec{background:#fff;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:16px 20px}
+.infosec h2{margin-bottom:6px}
+.infosec h2::before{display:none}
 /* 학교 표 */
 .schooltbl{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .schooltbl th{background:var(--soft);color:var(--accent-d);text-align:left;padding:9px 14px;font-weight:700;width:90px;white-space:nowrap;vertical-align:top}
@@ -479,7 +511,7 @@ function pageSubject(dong, subj, lv, chere){
   const faqSec = gen.secs.find(s=>s.h==="자주 묻는 질문");
   const textSecs = gen.secs.filter(s=>s.h!=="자주 묻는 질문");
   const toc = `<div class="toc"><h2>이 페이지에서 다루는 내용</h2><ul>${textSecs.map((s,i)=>`<li><a href="#s${i}">${esc(s.h)}</a></li>`).join("")}<li><a href="#schools">인근 학교</a></li><li><a href="#list">학원 안내</a></li><li><a href="#faq">자주 묻는 질문</a></li></ul></div>`;
-  const secs = textSecs.map((s,i)=>`<section class="sec" id="s${i}"><h2>${esc(s.h)}</h2><p style="white-space:pre-line">${esc(s.p)}</p></section>`).join("");
+  const secs = textSecs.map((s,i)=>renderSec(s,i)).join("");
   // 학교 표
   let schoolTbl = "";
   if(schools.length){
@@ -508,6 +540,24 @@ function parseFaq(text){
   for(const ln of lines){ if(ln.startsWith("Q.")){ if(q)out.push([q.q,q.a]); q={q:ln.slice(2).trim(),a:""}; } else if(q){ q.a += (q.a?" ":"")+ln.trim(); } }
   if(q)out.push([q.q,q.a]);
   return out;
+}
+
+// 섹션 타입별 렌더링
+const SEC_ICON = {check:"✅",step:"📈",box:"💡",info:"📋",plain:"📝"};
+function renderSec(s,i){
+  const icon = SEC_ICON[s.type]||"";
+  const head = `<h2><span class="sicon">${icon}</span>${esc(s.h)}</h2>`;
+  let inner = `<p>${esc(s.p)}</p>`;
+  if(s.type==="check" && s.items){
+    inner += `<ul class="checklist">${s.items.map(it=>`<li>${esc(it)}</li>`).join("")}</ul>`;
+  } else if(s.type==="step" && s.steps){
+    inner += `<div class="steps">${s.steps.map((st,n)=>`<div class="step"><div class="stepnum">${n+1}</div><div class="stepbody"><b>${esc(st.t)}</b><span>${esc(st.d)}</span></div></div>`).join("")}</div>`;
+  } else if(s.type==="box" && s.items){
+    inner += `<div class="pointbox"><div class="pbtitle">학습 포인트</div><ul>${s.items.map(it=>`<li>${esc(it)}</li>`).join("")}</ul></div>`;
+  } else if(s.type==="info"){
+    return `<section class="sec infosec" id="s${i}">${head}<p>${esc(s.p)}</p></section>`;
+  }
+  return `<section class="sec" id="s${i}">${head}${inner}</section>`;
 }
 
 function thumbBlock(key, title, sub){
