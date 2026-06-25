@@ -6,7 +6,8 @@ const SITE_NAME = "세상의 모든학원";
 const PHONE = "010-9876-8282";
 const PHONE_TEL = "01098768282";
 // 문의 저장용 Apps Script 웹앱 주소 (배포 후 여기에 붙여넣기)
-const INQUIRY_ENDPOINT = "https://script.google.com/macros/s/AKfycbxHCKTi-VjJhkMIg4aZpWEet7UcP0X-jh5KqiBU83M38_bjcdfiprfgD0Jjm721WKO8/exec"; // 예: "https://script.google.com/macros/s/AKfy.../exec"
+const INQUIRY_ENDPOINT = "https://script.google.com/macros/s/AKfycbxHCKTi-VjJhkMIg4aZpWEet7UcP0X-jh5KqiBU83M38_bjcdfiprfgD0Jjm721WKO8/exec";
+const INDEXNOW_KEY = "a90672a3fd264464a1115bf3af116709"; // 예: "https://script.google.com/macros/s/AKfy.../exec"
 
 // 슬러그 역매핑
 let _slug2dong = null;
@@ -841,6 +842,24 @@ ${itemXml}
   return new Response(xml,{headers:{"content-type":"application/rss+xml; charset=utf-8"}});
 }
 function robots(){ return new Response(`User-agent: *\nAllow: /\nSitemap: ${SITE_URL}/sitemap.xml\n#DaumWebMasterTool:c644f4dc02b011738d6d5e1a90f02f3de7b52139c45d0e5115443b8c5f558b4e:oNr+BPWqeDif3frZUZg4VA==\n`,{headers:{"content-type":"text/plain"}}); }
+
+// IndexNow: 전체 URL을 검색엔진에 즉시 제출
+async function indexnowPing(){
+  const idx=buildIndex();
+  const urls=[`${SITE_URL}/`,`${SITE_URL}/regions`];
+  Object.keys(idx.bySido).forEach(s=>urls.push(SITE_URL+urlRegion(s)));
+  Object.keys(idx.byDong).forEach(d=>urls.push(SITE_URL+urlDong(d)));
+  Object.keys(idx.pages).forEach(k=>{ const [d,s,l]=k.split("|"); urls.push(SITE_URL+urlPage(d,s,l)); });
+  CENTERS.forEach(c=>urls.push(SITE_URL+urlCenter(c.id)));
+  // IndexNow는 한 번에 최대 10000개. 우리는 2380개라 한 번에 가능
+  const payload={ host:"semoacademy.com", key:INDEXNOW_KEY, keyLocation:`${SITE_URL}/${INDEXNOW_KEY}.txt`, urlList:urls };
+  try{
+    const resp=await fetch("https://api.indexnow.org/indexnow",{ method:"POST", headers:{"Content-Type":"application/json; charset=utf-8"}, body:JSON.stringify(payload) });
+    return new Response(`IndexNow 제출 완료\n제출 URL 수: ${urls.length}\n응답 코드: ${resp.status}\n(200/202면 정상)`,{headers:{"content-type":"text/plain; charset=utf-8"}});
+  }catch(e){
+    return new Response(`IndexNow 제출 실패: ${e.message}`,{status:500,headers:{"content-type":"text/plain; charset=utf-8"}});
+  }
+}
 function faviconSvg(){
   const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2c6e63"/><stop offset="1" stop-color="#3a8576"/></linearGradient></defs><rect width="40" height="40" rx="9" fill="url(#g)"/><polygon points="20,10 32,30 8,30" fill="#fff"/><polygon points="20,17 27,30 13,30" fill="#2c6e63" opacity="0.28"/></svg>`;
   return new Response(svg,{headers:{"content-type":"image/svg+xml","cache-control":"public, max-age=86400"}});
@@ -856,6 +875,8 @@ async function handle(request){
   if(path==="/robots.txt") return robots();
   if(path==="/sitemap.xml") return sitemap();
   if(path==="/rss.xml"||path==="/rss"||path==="/feed") return rss();
+  if(path===`/${INDEXNOW_KEY}.txt`) return new Response(INDEXNOW_KEY,{headers:{"content-type":"text/plain"}});
+  if(path==="/indexnow-ping") return indexnowPing();
   if(path==="/favicon.svg") return faviconSvg();
   if(path==="/favicon.ico") return faviconSvg();
   if(path==="/regions") return html(pageRegions());
