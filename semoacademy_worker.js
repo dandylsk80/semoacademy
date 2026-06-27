@@ -634,8 +634,8 @@ h1{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.28;margin-b
 .herobtns .hcall{background:var(--accent);color:#fff;box-shadow:0 6px 18px rgba(44,110,99,.28)}
 .herobtns .hinq{background:#e8633a;color:#fff;box-shadow:0 6px 18px rgba(232,99,58,.32)}
 /* 과목 카드 - 교과서/노트 탭 느낌 */
-.subjgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:6px 0}
-.subjcard{position:relative;background:#fff;border:1px solid #e3dccb;border-radius:14px;padding:24px 16px 20px;text-align:center;transition:transform .12s}
+.subjgrid{display:flex;flex-wrap:wrap;gap:14px;margin:6px 0;justify-content:center}
+.subjcard{position:relative;background:#fff;border:1px solid #e3dccb;border-radius:14px;padding:24px 16px 20px;text-align:center;transition:transform .12s;flex:1 1 150px;max-width:200px}
 .subjcard::before{content:"";position:absolute;top:0;left:18px;right:18px;height:4px;border-radius:0 0 4px 4px}
 .subjcard:nth-child(1)::before{background:#e8633a}
 .subjcard:nth-child(2)::before{background:#2c6e63}
@@ -686,7 +686,30 @@ h1{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.28;margin-b
 .ftlinks a:hover{color:#fff;text-decoration:underline}
 .ftnote{font-size:12.5px;line-height:1.75;margin-bottom:10px;max-width:620px}
 .ftcopy{font-size:12px;color:#7d848e}
-@media(max-width:600px){h1{font-size:22px}.hero{padding:42px 22px;margin-top:24px}.hero h1{font-size:32px}.hero h1 .sub2{font-size:20px}.hero h1 .pencil{font-size:26px}main{padding:34px 16px 44px}.summary .row{gap:8px 16px}.hero .stat div{min-width:90px;padding:15px 20px}}
+@media(max-width:600px){
+h1{font-size:22px}
+main{padding:24px 14px 44px}
+.hero{padding:38px 18px 38px 50px;margin-top:20px;border-radius:12px}
+.hero .springbar{width:34px}
+.hero .springbar span{left:9px;width:14px;height:14px}
+.hero::before{background-image:repeating-linear-gradient(180deg,transparent,transparent 33px,#d6e6e0 33px,#d6e6e0 34px)}
+.hero h1{font-size:28px;letter-spacing:-1px}
+.hero h1 .sub2{font-size:18px;margin-top:10px}
+.hero h1 .pencil{display:none}
+.hero p{font-size:15px}
+.hero .stat{gap:9px;margin-top:24px}
+.hero .stat div{min-width:0;flex:1;padding:14px 8px}
+.hero .stat b{font-size:25px}
+.herobtns{margin-top:24px;flex-direction:column}
+.herobtns a,.herobtns button{width:100%;justify-content:center;text-align:center;padding:14px 20px}
+.hero .deco{display:none}
+.summary .row{gap:8px 16px}
+.subjgrid{grid-template-columns:repeat(2,1fr);gap:10px}
+.howto{padding:22px 16px}
+.whygrid{grid-template-columns:1fr}
+.steps3{grid-template-columns:1fr}
+.popgrid{grid-template-columns:repeat(2,1fr)}
+}
 `;
 
 // ---------- 페이지: 동+과목+대상 ----------
