@@ -454,7 +454,7 @@ const CSS = `
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);line-height:1.7;-webkit-text-size-adjust:100%}
 .wrap{max-width:880px;margin:0 auto;padding:0 20px}
-.hd{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.hd{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;box-shadow:0 2px 12px rgba(0,0,0,.04)}
 .hd .wrap{display:flex;align-items:center;justify-content:space-between;height:58px}
 .logo{font-size:20px;font-weight:800;color:var(--accent);text-decoration:none;letter-spacing:-.5px;display:flex;align-items:center;gap:8px}
 .logo .logoimg{flex-shrink:0}
@@ -500,7 +500,7 @@ body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;b
 .cta a,.cta button{padding:12px 22px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;border:none;cursor:pointer}
 .cta .cphone{background:#fff;color:var(--accent)}
 .cta .cinq{background:#e8633a;color:#fff}
-main{padding:24px 20px 56px}
+main{padding:64px 20px 56px}
 .bc{font-size:13px;color:var(--sub);margin-bottom:16px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
 .bc a{color:var(--sub);text-decoration:none}.bc a:hover{color:var(--accent)}.bc i{color:#c3bdb2;font-style:normal}.bc span{color:var(--ink);font-weight:600}
 h1{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.28;margin-bottom:14px}
@@ -596,16 +596,21 @@ h1{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.28;margin-b
 .lgrid a:hover{border-color:var(--accent);color:var(--accent)}
 .lgrid a small{display:block;color:var(--sub);font-weight:400;font-size:12px;margin-top:3px}
 /* hero */
-.hero{background:linear-gradient(135deg,var(--accent),#3a8576);color:#fff;border-radius:18px;padding:38px 30px;margin-bottom:28px}
-.hero h1{color:#fff;font-size:27px;margin-bottom:10px}
-.hero p{color:#d6ebe6;font-size:15.5px;max-width:560px}
-.hero .stat{display:flex;gap:26px;margin-top:20px}
-.hero .stat div{font-size:13px;color:#bfdcd5}
-.hero .stat b{display:block;font-size:22px;color:#fff;font-weight:800}
-.herobtns{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
-.herobtns a,.herobtns button{padding:12px 22px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;border:none;cursor:pointer}
-.herobtns .hcall{background:#fff;color:var(--accent)}
-.herobtns .hinq{background:#e8633a;color:#fff}
+.hero{position:relative;background:linear-gradient(140deg,#1c4a42 0%,#2c6e63 50%,#41937f 100%);color:#fff;border-radius:24px;padding:64px 34px 58px;margin-bottom:34px;overflow:hidden;text-align:center;box-shadow:0 16px 40px rgba(28,74,66,.3)}
+.hero::before{content:"";position:absolute;top:-90px;right:-70px;width:320px;height:320px;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 68%);border-radius:50%}
+.hero::after{content:"";position:absolute;bottom:-110px;left:-60px;width:280px;height:280px;background:radial-gradient(circle,rgba(255,216,138,.13),transparent 70%);border-radius:50%}
+.hero .herobadge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);color:#fff;font-size:13px;font-weight:700;padding:7px 17px;border-radius:30px;margin-bottom:22px;position:relative;border:1px solid rgba(255,255,255,.18)}
+.hero h1{position:relative;color:#fff;font-size:42px;font-weight:900;line-height:1.22;margin-bottom:18px;letter-spacing:-1.4px}
+.hero h1 .accent{display:inline-block;background:linear-gradient(100deg,#ffe9b0,#ffc861 55%,#ffb13d);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 10px rgba(255,180,77,.25))}
+.hero p{position:relative;color:#e3f1ec;font-size:16.5px;max-width:520px;margin:0 auto;line-height:1.7}
+.hero .stat{position:relative;display:flex;gap:14px;margin:28px auto 0;flex-wrap:wrap;justify-content:center}
+.hero .stat div{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.12);border-radius:15px;padding:15px 26px;font-size:12.5px;color:#d3e8e2;text-align:center;min-width:104px}
+.hero .stat b{display:block;font-size:28px;color:#fff;font-weight:900;margin-bottom:3px;letter-spacing:-.6px}
+.herobtns{position:relative;display:flex;gap:12px;margin-top:30px;flex-wrap:wrap;justify-content:center}
+.herobtns a,.herobtns button{padding:14px 28px;border-radius:12px;font-size:15.5px;font-weight:700;text-decoration:none;border:none;cursor:pointer;transition:transform .12s}
+.herobtns a:hover,.herobtns button:hover{transform:translateY(-2px)}
+.herobtns .hcall{background:#fff;color:var(--accent);box-shadow:0 4px 14px rgba(0,0,0,.12)}
+.herobtns .hinq{background:#e8633a;color:#fff;box-shadow:0 4px 14px rgba(232,99,58,.35)}
 /* 과목 카드 */
 .subjgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:6px 0}
 .subjcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 16px;text-align:center;transition:transform .12s,border-color .12s}
@@ -649,7 +654,7 @@ h1{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.28;margin-b
 .ftlinks a:hover{color:#fff;text-decoration:underline}
 .ftnote{font-size:12.5px;line-height:1.75;margin-bottom:10px;max-width:620px}
 .ftcopy{font-size:12px;color:#7d848e}
-@media(max-width:600px){h1{font-size:22px}.hero{padding:30px 22px}.hero h1{font-size:23px}main{padding:18px 16px 44px}.summary .row{gap:8px 16px}}
+@media(max-width:600px){h1{font-size:22px}.hero{padding:46px 22px 42px}.hero h1{font-size:30px}main{padding:30px 16px 44px}.summary .row{gap:8px 16px}.hero .stat div{min-width:88px;padding:13px 18px}.hero p br{display:none}}
 `;
 
 // ---------- 페이지: 동+과목+대상 ----------
@@ -826,7 +831,7 @@ function pageHome(){
   const faqHtml=`<section class="sec"><h2>자주 묻는 질문</h2><div class="faq">${homeFaqs.map(f=>`<details><summary><span class="q">Q. ${esc(f[0])}</span></summary><div class="a">${esc(f[1])}</div></details>`).join("")}</div></section>`;
   const faqLd=JSON.stringify({"@context":"https://schema.org","@type":"FAQPage","mainEntity":homeFaqs.map(f=>({"@type":"Question","name":f[0],"acceptedAnswer":{"@type":"Answer","text":f[1]}}))});
 
-  const body=`<div class="hero"><h1>우리 동네 학원 정보,<br>세상의 모든학원</h1><p>전국 지역별·과목별 학원 정보를 한곳에서. 동네 이름으로 우리 아이에게 맞는 학원을 찾아보세요.</p><div class="stat"><div><b>${totalCenter}</b>등록 학원</div><div><b>${totalDong}</b>동네</div><div><b>${sidos.length}</b>시·도</div></div><div class="herobtns"><a class="hcall" href="tel:${PHONE_TEL}">📞 ${PHONE}</a><button class="hinq" onclick="openInq()">✉️ 문의하기</button></div></div>
+  const body=`<div class="hero"><div class="herobadge">📍 전국 ${totalDong}개 동네 · ${totalCenter}개 학원 정보</div><h1><span class="accent">세상의 모든학원</span><br>우리 동네에서 찾다</h1><p>전국 지역별·과목별 학원 정보를 한곳에서.<br>동네 이름으로 우리 아이에게 딱 맞는 학원을 만나보세요.</p><div class="stat"><div><b>${totalCenter}</b>등록 학원</div><div><b>${totalDong}</b>동네</div><div><b>${sidos.length}</b>시·도</div></div><div class="herobtns"><a class="hcall" href="tel:${PHONE_TEL}">📞 ${PHONE}</a><button class="hinq" onclick="openInq()">✉️ 문의하기</button></div></div>
 
 <section class="sec"><h2>과목별 학원</h2><p class="subt">국어·영어·수학·과학·사회, 초·중·고 전 과목 학원 정보를 안내합니다.</p><div class="subjgrid">${subjCards}</div></section>
 
