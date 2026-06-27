@@ -606,6 +606,37 @@ h1{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.28;margin-b
 .herobtns a,.herobtns button{padding:12px 22px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;border:none;cursor:pointer}
 .herobtns .hcall{background:#fff;color:var(--accent)}
 .herobtns .hinq{background:#e8633a;color:#fff}
+/* 과목 카드 */
+.subjgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:6px 0}
+.subjcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 16px;text-align:center;transition:transform .12s,border-color .12s}
+.subjcard:hover{transform:translateY(-3px);border-color:var(--accent)}
+.subjicon{font-size:32px;margin-bottom:8px}
+.subjname{font-size:16px;font-weight:800;color:var(--ink)}
+.subjdesc{font-size:12.5px;color:var(--sub);margin-top:4px}
+/* 이용방법 3단계 */
+.howto{margin:30px 0}
+.howto h2{font-size:18.5px;font-weight:700;color:var(--ink);margin-bottom:14px}
+.steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.s3{background:var(--soft);border-radius:14px;padding:20px 18px;text-align:center}
+.s3n{width:38px;height:38px;margin:0 auto 10px;background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800}
+.s3t{font-size:15.5px;font-weight:700;color:var(--ink);margin-bottom:5px}
+.s3d{font-size:13px;color:var(--sub);line-height:1.55}
+@media(max-width:600px){.steps3{grid-template-columns:1fr}}
+/* 인기 지역 */
+.popgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.popchip{background:#fff;border:1px solid var(--line);border-radius:11px;padding:13px 15px;text-decoration:none;transition:border-color .12s}
+.popchip:hover{border-color:var(--accent)}
+.popchip b{display:block;font-size:15px;color:var(--ink);font-weight:700}
+.popchip span{font-size:12px;color:var(--sub)}
+/* 특징 */
+.why{margin:30px 0}
+.why h2{font-size:18.5px;font-weight:700;color:var(--ink);margin-bottom:14px}
+.whygrid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
+.whyitem{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.whyic{font-size:26px;display:block;margin-bottom:8px}
+.whyitem b{font-size:15.5px;color:var(--ink);font-weight:700;display:block;margin-bottom:4px}
+.whyitem p{font-size:13.5px;color:var(--sub);line-height:1.55}
+@media(max-width:600px){.whygrid{grid-template-columns:1fr}}
 /* note */
 .note{background:var(--warn-bg);border:1px solid var(--warn-bd);color:var(--warn-ink);border-radius:11px;padding:13px 17px;font-size:13.5px;margin:22px 0 0;line-height:1.6}
 .subt{font-size:13px;color:var(--sub);margin:-6px 0 18px}
@@ -775,10 +806,53 @@ function pageHome(){
   const totalCenter=CENTERS.length;
   const grid=sidos.map(sido=>{ const dongCnt=Object.values(idx.bySido[sido]).reduce((s,x)=>s+x.size,0); return `<a href="${urlRegion(sido)}">${esc(sido)}<small>${dongCnt}개 지역</small></a>`; }).join("");
   const canonical=SITE_URL+"/";
+
+  // 인기 지역: 센터 수 많은 동 top 12
+  const dongCount={};
+  CENTERS.forEach(c=>{ if(c.dong) dongCount[c.dong]=(dongCount[c.dong]||0)+1; });
+  const popDongs=Object.keys(dongCount).sort((a,b)=>dongCount[b]-dongCount[a]).slice(0,12);
+  const popChips=popDongs.map(d=>{ const info=idx.dongInfo[d]; return `<a class="popchip" href="${urlDong(d)}"><b>${esc(d)}</b><span>${esc(info.sgg)}</span></a>`; }).join("");
+
+  // 과목 카드
+  const subjCards=SUBJECTS.map(s=>`<div class="subjcard"><div class="subjicon">${SUBJ_ICON[s]}</div><div class="subjname">${esc(s)}</div><div class="subjdesc">초·중·고 ${esc(s)} 학원</div></div>`).join("");
+
+  // 메인 FAQ
+  const homeFaqs=[
+    ["세상의 모든학원은 어떤 사이트인가요?","전국 지역별·과목별 학원 정보를 한곳에 모아 안내하는 정보 제공 사이트입니다. 동네 이름으로 우리 아이에게 맞는 학원을 쉽게 찾을 수 있습니다."],
+    ["우리 동네 학원은 어떻게 찾나요?","상단 또는 아래 '지역으로 찾기'에서 시·도를 선택하고, 시군구와 동네를 차례로 고르면 해당 지역의 과목별·학년별 학원 정보를 볼 수 있습니다."],
+    ["교습비와 수업 시간도 나와 있나요?","교습비와 수업 시간은 지역·과목·학생 상황에 따라 다르므로 사이트에는 표시하지 않습니다. 자세한 사항은 각 학원에 방문상담으로 확인하실 수 있습니다."],
+    ["상담은 어떻게 받나요?","페이지의 전화 버튼으로 바로 통화하시거나, 문의하기 버튼으로 학생 정보와 궁금한 점을 남기시면 안내를 받으실 수 있습니다."]
+  ];
+  const faqHtml=`<section class="sec"><h2>자주 묻는 질문</h2><div class="faq">${homeFaqs.map(f=>`<details><summary><span class="q">Q. ${esc(f[0])}</span></summary><div class="a">${esc(f[1])}</div></details>`).join("")}</div></section>`;
+  const faqLd=JSON.stringify({"@context":"https://schema.org","@type":"FAQPage","mainEntity":homeFaqs.map(f=>({"@type":"Question","name":f[0],"acceptedAnswer":{"@type":"Answer","text":f[1]}}))});
+
   const body=`<div class="hero"><h1>우리 동네 학원 정보,<br>세상의 모든학원</h1><p>전국 지역별·과목별 학원 정보를 한곳에서. 동네 이름으로 우리 아이에게 맞는 학원을 찾아보세요.</p><div class="stat"><div><b>${totalCenter}</b>등록 학원</div><div><b>${totalDong}</b>동네</div><div><b>${sidos.length}</b>시·도</div></div><div class="herobtns"><a class="hcall" href="tel:${PHONE_TEL}">📞 ${PHONE}</a><button class="hinq" onclick="openInq()">✉️ 문의하기</button></div></div>
+
+<section class="sec"><h2>과목별 학원</h2><p class="subt">국어·영어·수학·과학·사회, 초·중·고 전 과목 학원 정보를 안내합니다.</p><div class="subjgrid">${subjCards}</div></section>
+
+<section class="howto"><h2>이렇게 찾으세요</h2><div class="steps3">
+<div class="s3"><div class="s3n">1</div><div class="s3t">지역 선택</div><div class="s3d">시·도 → 시군구 → 동네 순으로 우리 동네를 찾습니다.</div></div>
+<div class="s3"><div class="s3n">2</div><div class="s3t">과목·학년 선택</div><div class="s3d">초·중·고 학년과 과목을 골라 맞는 학원 정보를 봅니다.</div></div>
+<div class="s3"><div class="s3n">3</div><div class="s3t">전화·문의 상담</div><div class="s3d">전화나 문의하기로 학습 상담을 받아보세요.</div></div>
+</div></section>
+
+<section class="sec"><h2>인기 지역 바로가기</h2><p class="subt">학원이 많은 동네를 빠르게 확인하세요.</p><div class="popgrid">${popChips}</div></section>
+
 <section class="sec"><h2>지역으로 찾기</h2><p class="subt">시·도를 선택하면 시군구·동네별 학원 정보를 볼 수 있습니다.</p><div class="lgrid">${grid}</div></section>
+
+<section class="why"><h2>세상의 모든학원, 이런 점이 좋아요</h2><div class="whygrid">
+<div class="whyitem"><span class="whyic">🗺️</span><b>동네 단위 검색</b><p>전국 ${totalDong}개 동네의 학원 정보를 지역별로 정리했습니다.</p></div>
+<div class="whyitem"><span class="whyic">📚</span><b>과목·학년별 안내</b><p>초·중·고 학년과 5개 과목별로 맞는 정보를 제공합니다.</p></div>
+<div class="whyitem"><span class="whyic">🏫</span><b>인근 학교 정보</b><p>각 지역 인근 학교와 내신 대비 정보를 함께 안내합니다.</p></div>
+<div class="whyitem"><span class="whyic">💬</span><b>간편 상담</b><p>전화와 문의하기로 빠르게 학습 상담을 받을 수 있습니다.</p></div>
+</div></section>
+
+${faqHtml}
+
+<div class="cta"><h2>우리 아이에게 맞는 학원을 찾고 계신가요?</h2><p>전화 또는 문의하기로 학습 상담을 받아보세요.</p><div class="ctabtns"><a class="cphone" href="tel:${PHONE_TEL}">📞 ${PHONE}</a><button class="cinq" onclick="openInq()">✉️ 문의 남기기</button></div></div>
+
 <div class="note">전국 학원 정보를 지역·과목별로 안내합니다. 정확한 수업 시간 및 교습비는 각 학원에 방문상담을 통해 확인하시기 바랍니다.</div>`;
-  return layout({title:`${SITE_NAME} | 전국 지역별·과목별 학원 정보`, desc:"전국 지역별·과목별 학원 정보를 한곳에서. 동네 이름으로 우리 아이에게 맞는 영어·수학·국어·과학·사회 학원을 찾아보세요.", canonical, jsonld:"", body});
+  return layout({title:`${SITE_NAME} | 전국 지역별·과목별 학원 정보`, desc:"전국 지역별·과목별 학원 정보를 한곳에서. 동네 이름으로 우리 아이에게 맞는 영어·수학·국어·과학·사회 학원을 찾아보세요.", canonical, jsonld:faqLd, body});
 }
 
 // ---------- 페이지: 시도 ----------
