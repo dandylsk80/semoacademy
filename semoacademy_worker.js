@@ -43,10 +43,39 @@ function pick(rng,arr){ return arr[Math.floor(rng()*arr.length)]; }
 // ---------- 썸네일 ----------
 // 나중에 image/ 폴더에 넣을 이미지 파일명 30장. 비어있으면 placeholder 표시.
 const THUMBS = [
-  // 예: "pexels-419907350-37856472.jpg", "pexels-betul-341981540-32814268.jpg", ...
-  // 이미지 업로드 후 여기에 파일명만 채우면 자동 반영됩니다.
+  "pexels-amnahmohammad-7935224.jpg",
+  "pexels-ann-h-45017-38291753.jpg",
+  "pexels-asia-culture-center-3116378-13916997.jpg",
+  "pexels-chipi1189-33964549.jpg",
+  "pexels-delot-18471480.jpg",
+  "pexels-doan-thanh-binh-2147604563-36887759.jpg",
+  "pexels-enginakyurt-2946974.jpg",
+  "pexels-hujason-29461083.jpg",
+  "pexels-joshsorenson-990432.jpg",
+  "pexels-jueonkim-35855544.jpg",
+  "pexels-karola-g-4218588.jpg",
+  "pexels-katerina-holmes-5905443.jpg",
+  "pexels-marineorga-28396906.jpg",
+  "pexels-martabranco-32046500.jpg",
+  "pexels-miniperde-33872172.jpg",
+  "pexels-nguyendesigner-38094564.jpg",
+  "pexels-nui-malama-169330637-19582451.jpg",
+  "pexels-pixabay-159577.jpg",
+  "pexels-pixabay-159581.jpg",
+  "pexels-pixabay-220316.jpg",
+  "pexels-pixabay-278888.jpg",
+  "pexels-pramodtiwari-13288524.jpg",
+  "pexels-ron-lach-9871139.jpg",
+  "pexels-ronaldo-guiraldelli-2110705-13042101.jpg",
+  "pexels-samarmourya-12365550.jpg",
+  "pexels-soc-nang-d-ng-2150345854-34438590.jpg",
+  "pexels-tirachard-kumtanom-112571-574283.jpg",
+  "pexels-ugurlu-photographer-108972-336407.jpg",
+  "pexels-veronika-andrews-2153322013-34260873.jpg",
+  "pexels-voltfather-18243125.jpg",
+  "pexels-yaroslav-shuraev-9489804.jpg",
 ];
-const THUMB_DIR = "/image"; // 이미지 접근 경로 (단말기 방식 확인 후 조정 가능)
+const THUMB_DIR = "/image";
 function thumbFor(key){
   if(!THUMBS.length) return null;
   const rng = seedRng(key+"thumb");
