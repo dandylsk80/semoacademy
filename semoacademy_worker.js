@@ -382,6 +382,7 @@ ${ldBlocks}
 <p class="ftcopy">© ${SITE}</p></div></footer>
 ${FLOATING}
 ${INQUIRY_MODAL}
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script>${INQUIRY_JS}</script>
 </body></html>`;
 }
@@ -405,7 +406,7 @@ const INQUIRY_MODAL = `<div class="inqback" id="inqBack" onclick="if(event.targe
 <p class="inqdesc">아래 내용을 남겨 주시면 빠르게 안내해 드립니다. (문의내용 외 모두 필수)</p>
 <div class="inqfield"><label>학생 이름 <em>*</em></label><input id="iqName" type="text" placeholder="학생 성함"></div>
 <div class="inqfield"><label>연락처 <em>*</em></label><input id="iqPhone" type="tel" placeholder="010-0000-0000"></div>
-<div class="inqfield"><label>주소 (도로명) <em>*</em></label><input id="iqAddr" type="text" placeholder="예: 경기 하남시 덕풍동로 119"></div>
+<div class="inqfield"><label>주소 (도로명) <em>*</em></label><input id="iqAddr" type="text" placeholder="클릭하여 주소 검색" readonly onclick="searchAddr()" style="cursor:pointer;background:#fff"><input id="iqAddrDetail" type="text" placeholder="상세주소 (동·호수 등)" style="margin-top:8px"></div>
 <div class="inqrow">
 <div class="inqfield"><label>학년 <em>*</em></label><select id="iqGrade">
 <option value="">선택</option>
@@ -428,23 +429,36 @@ const INQUIRY_MODAL = `<div class="inqback" id="inqBack" onclick="if(event.targe
 const INQUIRY_JS = `
 function openInq(){document.getElementById('inqBack').style.display='flex';}
 function closeInq(){document.getElementById('inqBack').style.display='none';}
+function searchAddr(){
+  if(typeof daum==='undefined'||!daum.Postcode){ alert('주소 검색을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.'); return; }
+  new daum.Postcode({
+    oncomplete:function(data){
+      var addr = data.roadAddress || data.jibunAddress;
+      if(data.buildingName) addr += ' ('+data.buildingName+')';
+      document.getElementById('iqAddr').value = addr;
+      document.getElementById('iqAddrDetail').focus();
+    }
+  }).open();
+}
 async function submitInq(){
   var name=document.getElementById('iqName').value.trim();
   var phone=document.getElementById('iqPhone').value.trim();
   var addr=document.getElementById('iqAddr').value.trim();
+  var addrDetail=document.getElementById('iqAddrDetail').value.trim();
   var grade=document.getElementById('iqGrade').value;
   var subject=document.getElementById('iqSubject').value;
   var msg=document.getElementById('iqMsg').value.trim();
   var note=document.getElementById('iqNote');
   if(!name||!phone||!addr||!grade||!subject){note.style.color='#c0392b';note.textContent='문의내용을 제외한 모든 항목을 입력해 주세요.';return;}
+  var fullAddr = addr + (addrDetail ? ' '+addrDetail : '');
   note.style.color='#5b636e';note.textContent='전송 중...';
   var endpoint=${JSON.stringify(INQUIRY_ENDPOINT)};
-  var payload={name:name,phone:phone,address:addr,grade:grade,subject:subject,message:msg,page:location.href,time:new Date().toLocaleString('ko-KR')};
+  var payload={name:name,phone:phone,address:fullAddr,grade:grade,subject:subject,message:msg,page:location.href,time:new Date().toLocaleString('ko-KR')};
   if(!endpoint){note.style.color='#c0392b';note.textContent='문의 접수 준비 중입니다. 전화로 문의해 주세요.';return;}
   try{
     await fetch(endpoint,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
     note.style.color='#2c6e63';note.textContent='문의가 접수되었습니다. 곧 연락드리겠습니다.';
-    ['iqName','iqPhone','iqAddr','iqMsg'].forEach(function(id){document.getElementById(id).value='';});
+    ['iqName','iqPhone','iqAddr','iqAddrDetail','iqMsg'].forEach(function(id){document.getElementById(id).value='';});
     document.getElementById('iqGrade').value='';document.getElementById('iqSubject').value='';
   }catch(e){ note.style.color='#c0392b';note.textContent='전송에 실패했습니다. 전화로 문의해 주세요.'; }
 }`;
@@ -452,7 +466,7 @@ async function submitInq(){
 const CSS = `
 :root{--bg:#f7f6f3;--ink:#21262c;--sub:#616a75;--line:#e6e2da;--accent:#2c6e63;--accent-d:#22564d;--soft:#eef4f2;--card:#fff;--warn-bg:#fff8ee;--warn-bd:#f3e2c4;--warn-ink:#7a5a24}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);line-height:1.7;-webkit-text-size-adjust:100%}
+body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f4f1ea;color:var(--ink);line-height:1.7;-webkit-text-size-adjust:100%}
 .wrap{max-width:880px;margin:0 auto;padding:0 20px}
 .hd{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;box-shadow:0 2px 12px rgba(0,0,0,.04)}
 .hd .wrap{display:flex;align-items:center;justify-content:space-between;height:58px}
@@ -521,7 +535,7 @@ h1{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.28;margin-b
 .aliasbar b{color:var(--accent);font-weight:700}
 .aliasbar span{color:var(--accent-d);font-weight:600}
 /* 상단 요약 카드 */
-.summary{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:22px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.summary{background:#fff;border:1px solid #e3dccb;border-radius:14px;padding:18px 20px;margin-bottom:22px}
 .summary .row{display:flex;flex-wrap:wrap;gap:10px 22px;margin-bottom:8px}
 .summary .item{font-size:14px;color:var(--sub)}
 .summary .item b{color:var(--ink);font-weight:700;margin-left:5px}
@@ -577,7 +591,7 @@ h1{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.28;margin-b
 .faq .a{padding:0 18px 16px;font-size:14px;color:var(--sub);line-height:1.7}
 /* 학원 카드 */
 .acards{display:grid;gap:14px;margin:8px 0 4px}
-.acard{background:#fff;border:1px solid var(--line);border-radius:13px;padding:18px 20px;transition:border-color .15s;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.acard{background:#fff;border:1px solid #e3dccb;border-radius:13px;padding:18px 20px;transition:border-color .15s}
 .acard:hover{border-color:var(--accent)}
 .acard h3{font-size:16.5px;font-weight:700;margin-bottom:10px}
 .acard h3 a{color:inherit;text-decoration:none}
@@ -596,50 +610,68 @@ h1{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.28;margin-b
 .lgrid a:hover{border-color:var(--accent);color:var(--accent)}
 .lgrid a small{display:block;color:var(--sub);font-weight:400;font-size:12px;margin-top:3px}
 /* hero */
-.hero{position:relative;background:linear-gradient(140deg,#1c4a42 0%,#2c6e63 50%,#41937f 100%);color:#fff;border-radius:24px;padding:64px 34px 58px;margin-bottom:34px;overflow:hidden;text-align:center;box-shadow:0 16px 40px rgba(28,74,66,.3)}
-.hero::before{content:"";position:absolute;top:-90px;right:-70px;width:320px;height:320px;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 68%);border-radius:50%}
-.hero::after{content:"";position:absolute;bottom:-110px;left:-60px;width:280px;height:280px;background:radial-gradient(circle,rgba(255,216,138,.13),transparent 70%);border-radius:50%}
-.hero .herobadge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);color:#fff;font-size:13px;font-weight:700;padding:7px 17px;border-radius:30px;margin-bottom:22px;position:relative;border:1px solid rgba(255,255,255,.18)}
-.hero h1{position:relative;color:#fff;font-size:42px;font-weight:900;line-height:1.22;margin-bottom:18px;letter-spacing:-1.4px}
-.hero h1 .accent{display:inline-block;background:linear-gradient(100deg,#ffe9b0,#ffc861 55%,#ffb13d);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 10px rgba(255,180,77,.25))}
-.hero p{position:relative;color:#e3f1ec;font-size:16.5px;max-width:520px;margin:0 auto;line-height:1.7}
-.hero .stat{position:relative;display:flex;gap:14px;margin:28px auto 0;flex-wrap:wrap;justify-content:center}
-.hero .stat div{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.12);border-radius:15px;padding:15px 26px;font-size:12.5px;color:#d3e8e2;text-align:center;min-width:104px}
-.hero .stat b{display:block;font-size:28px;color:#fff;font-weight:900;margin-bottom:3px;letter-spacing:-.6px}
-.herobtns{position:relative;display:flex;gap:12px;margin-top:30px;flex-wrap:wrap;justify-content:center}
-.herobtns a,.herobtns button{padding:14px 28px;border-radius:12px;font-size:15.5px;font-weight:700;text-decoration:none;border:none;cursor:pointer;transition:transform .12s}
+.hero{position:relative;background:#fffef9;border:1px solid #e8e0d0;color:var(--ink);border-radius:14px;padding:54px 40px 54px 72px;margin-top:40px;margin-bottom:36px;overflow:hidden;text-align:center;box-shadow:0 2px 10px rgba(44,110,99,.06)}
+.hero::before{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(-9deg,transparent,transparent 36px,#d6e6e0 36px,#d6e6e0 37px);pointer-events:none;opacity:.8}
+.hero .springbar{position:absolute;top:0;bottom:0;left:0;width:46px;background:linear-gradient(90deg,#f4efe3,#ece5d3);border-right:2px solid #f3c9c0;z-index:1}
+.hero .springbar span{position:absolute;left:15px;width:17px;height:17px;border-radius:50%;background:#fff;border:2px solid #cbb89a;box-shadow:inset 0 1px 2px rgba(0,0,0,.18)}
+.hero .deco{position:absolute;font-size:28px;opacity:.15;pointer-events:none;user-select:none;z-index:0}
+.hero .d1{top:28px;right:42px;transform:rotate(12deg);font-size:30px}
+.hero .d2{bottom:38px;right:50px;transform:rotate(-10deg);font-size:30px}
+.hero .d3{bottom:50px;left:92px;transform:rotate(8deg)}
+.hero .herobadge{display:inline-flex;align-items:center;gap:7px;background:#fff;color:#9a6312;font-size:13px;font-weight:700;padding:8px 18px;border-radius:30px;margin-bottom:24px;position:relative;border:1px solid #f5e2bf;box-shadow:0 2px 8px rgba(0,0,0,.04);z-index:2}
+.hero h1{position:relative;color:var(--ink);font-size:46px;font-weight:900;line-height:1.18;margin-bottom:20px;letter-spacing:-1.6px;z-index:2}
+.hero h1 .accent{position:relative;display:inline-block;color:var(--accent);z-index:1}
+.hero h1 .accent::after{content:"";position:absolute;left:-4px;right:-4px;bottom:4px;height:14px;background:linear-gradient(90deg,#ffe082,#ffd166);z-index:-1;border-radius:3px;transform:rotate(-1deg)}
+.hero h1 .sub2{display:block;font-size:26px;font-weight:800;color:var(--ink);margin-top:14px;letter-spacing:-.8px}
+.hero h1 .pencil{display:inline-block;margin-left:6px;font-size:34px;vertical-align:-2px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.12))}
+.hero p{position:relative;color:var(--sub);font-size:16.5px;max-width:540px;margin:0 auto;line-height:1.75;z-index:2}
+.hero .stat{position:relative;display:flex;gap:16px;margin:32px auto 0;flex-wrap:wrap;justify-content:center;z-index:2}
+.hero .stat div{background:#fff;border:1px solid #e3dccb;border-radius:16px;padding:18px 30px;font-size:13px;color:var(--sub);text-align:center;min-width:112px}
+.hero .stat b{display:block;font-size:30px;color:var(--accent);font-weight:900;margin-bottom:3px;letter-spacing:-.8px}
+.herobtns{position:relative;display:flex;gap:12px;margin-top:32px;flex-wrap:wrap;justify-content:center;z-index:2}
+.herobtns a,.herobtns button{padding:15px 30px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none;border:none;cursor:pointer;transition:transform .12s}
 .herobtns a:hover,.herobtns button:hover{transform:translateY(-2px)}
-.herobtns .hcall{background:#fff;color:var(--accent);box-shadow:0 4px 14px rgba(0,0,0,.12)}
-.herobtns .hinq{background:#e8633a;color:#fff;box-shadow:0 4px 14px rgba(232,99,58,.35)}
-/* 과목 카드 */
-.subjgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:6px 0}
-.subjcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 16px;text-align:center;transition:transform .12s,border-color .12s}
-.subjcard:hover{transform:translateY(-3px);border-color:var(--accent)}
-.subjicon{font-size:32px;margin-bottom:8px}
-.subjname{font-size:16px;font-weight:800;color:var(--ink)}
-.subjdesc{font-size:12.5px;color:var(--sub);margin-top:4px}
-/* 이용방법 3단계 */
-.howto{margin:30px 0}
-.howto h2{font-size:18.5px;font-weight:700;color:var(--ink);margin-bottom:14px}
-.steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.s3{background:var(--soft);border-radius:14px;padding:20px 18px;text-align:center}
-.s3n{width:38px;height:38px;margin:0 auto 10px;background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800}
-.s3t{font-size:15.5px;font-weight:700;color:var(--ink);margin-bottom:5px}
+.herobtns .hcall{background:var(--accent);color:#fff;box-shadow:0 6px 18px rgba(44,110,99,.28)}
+.herobtns .hinq{background:#e8633a;color:#fff;box-shadow:0 6px 18px rgba(232,99,58,.32)}
+/* 과목 카드 - 교과서/노트 탭 느낌 */
+.subjgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:6px 0}
+.subjcard{position:relative;background:#fff;border:1px solid #e3dccb;border-radius:14px;padding:24px 16px 20px;text-align:center;transition:transform .12s}
+.subjcard::before{content:"";position:absolute;top:0;left:18px;right:18px;height:4px;border-radius:0 0 4px 4px}
+.subjcard:nth-child(1)::before{background:#e8633a}
+.subjcard:nth-child(2)::before{background:#2c6e63}
+.subjcard:nth-child(3)::before{background:#3b82c4}
+.subjcard:nth-child(4)::before{background:#7c5cc4}
+.subjcard:nth-child(5)::before{background:#d4a017}
+.subjcard:hover{border-color:var(--accent)}
+.subjicon{font-size:36px;margin-bottom:10px}
+.subjname{font-size:17px;font-weight:800;color:var(--ink)}
+.subjdesc{font-size:12.5px;color:var(--sub);margin-top:5px}
+/* 이용방법 3단계 - 노트 체크리스트 느낌 */
+.howto{margin:34px 0;background:#fbf9f4;border:1px solid #e3dccb;border-radius:18px;padding:28px 26px}
+.howto h2{font-size:20px;font-weight:800;color:var(--ink);margin-bottom:18px;text-align:center}
+.howto h2::before{content:"📝 ";font-size:18px}
+.steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.s3{position:relative;background:#fdfbf5;border:1px dashed #d8cfb8;border-radius:14px;padding:24px 18px;text-align:center}
+.s3n{width:42px;height:42px;margin:0 auto 12px;background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:900;box-shadow:0 3px 8px rgba(44,110,99,.25)}
+.s3t{font-size:16px;font-weight:800;color:var(--ink);margin-bottom:6px}
 .s3d{font-size:13px;color:var(--sub);line-height:1.55}
 @media(max-width:600px){.steps3{grid-template-columns:1fr}}
-/* 인기 지역 */
-.popgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
-.popchip{background:#fff;border:1px solid var(--line);border-radius:11px;padding:13px 15px;text-decoration:none;transition:border-color .12s}
+/* 인기 지역 - 포스트잇 느낌 */
+.popgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:12px}
+.popchip{background:#fff;border:1px solid #e3dccb;border-radius:11px;padding:14px 16px;text-decoration:none;transition:transform .12s;position:relative}
+.popchip::before{content:"📍";position:absolute;top:10px;right:11px;font-size:12px;opacity:.5}
 .popchip:hover{border-color:var(--accent)}
-.popchip b{display:block;font-size:15px;color:var(--ink);font-weight:700}
+.popchip b{display:block;font-size:15.5px;color:var(--ink);font-weight:800}
 .popchip span{font-size:12px;color:var(--sub)}
-/* 특징 */
-.why{margin:30px 0}
-.why h2{font-size:18.5px;font-weight:700;color:var(--ink);margin-bottom:14px}
-.whygrid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
-.whyitem{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px}
-.whyic{font-size:26px;display:block;margin-bottom:8px}
-.whyitem b{font-size:15.5px;color:var(--ink);font-weight:700;display:block;margin-bottom:4px}
+/* 특징 - 노트 카드 */
+.why{margin:34px 0}
+.why h2{font-size:20px;font-weight:800;color:var(--ink);margin-bottom:16px;text-align:center}
+.why h2::before{content:"✨ "}
+.whygrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.whyitem{background:#fff;border:1px solid #e3dccb;border-radius:14px;padding:20px 22px}
+
+.whyic{font-size:30px;display:block;margin-bottom:10px}
+.whyitem b{font-size:16px;color:var(--ink);font-weight:800;display:block;margin-bottom:5px}
 .whyitem p{font-size:13.5px;color:var(--sub);line-height:1.55}
 @media(max-width:600px){.whygrid{grid-template-columns:1fr}}
 /* note */
@@ -654,7 +686,7 @@ h1{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.28;margin-b
 .ftlinks a:hover{color:#fff;text-decoration:underline}
 .ftnote{font-size:12.5px;line-height:1.75;margin-bottom:10px;max-width:620px}
 .ftcopy{font-size:12px;color:#7d848e}
-@media(max-width:600px){h1{font-size:22px}.hero{padding:46px 22px 42px}.hero h1{font-size:30px}main{padding:30px 16px 44px}.summary .row{gap:8px 16px}.hero .stat div{min-width:88px;padding:13px 18px}.hero p br{display:none}}
+@media(max-width:600px){h1{font-size:22px}.hero{padding:42px 22px;margin-top:24px}.hero h1{font-size:32px}.hero h1 .sub2{font-size:20px}.hero h1 .pencil{font-size:26px}main{padding:34px 16px 44px}.summary .row{gap:8px 16px}.hero .stat div{min-width:90px;padding:15px 20px}}
 `;
 
 // ---------- 페이지: 동+과목+대상 ----------
@@ -828,12 +860,13 @@ function pageHome(){
     ["교습비와 수업 시간도 나와 있나요?","교습비와 수업 시간은 지역·과목·학생 상황에 따라 다르므로 사이트에는 표시하지 않습니다. 자세한 사항은 각 학원에 방문상담으로 확인하실 수 있습니다."],
     ["상담은 어떻게 받나요?","페이지의 전화 버튼으로 바로 통화하시거나, 문의하기 버튼으로 학생 정보와 궁금한 점을 남기시면 안내를 받으실 수 있습니다."]
   ];
-  const faqHtml=`<section class="sec"><h2>자주 묻는 질문</h2><div class="faq">${homeFaqs.map(f=>`<details><summary><span class="q">Q. ${esc(f[0])}</span></summary><div class="a">${esc(f[1])}</div></details>`).join("")}</div></section>`;
+  const faqHtml=`<section class="sec"><h2>❓ 자주 묻는 질문</h2><div class="faq">${homeFaqs.map(f=>`<details><summary><span class="q">Q. ${esc(f[0])}</span></summary><div class="a">${esc(f[1])}</div></details>`).join("")}</div></section>`;
   const faqLd=JSON.stringify({"@context":"https://schema.org","@type":"FAQPage","mainEntity":homeFaqs.map(f=>({"@type":"Question","name":f[0],"acceptedAnswer":{"@type":"Answer","text":f[1]}}))});
 
-  const body=`<div class="hero"><div class="herobadge">📍 전국 ${totalDong}개 동네 · ${totalCenter}개 학원 정보</div><h1><span class="accent">세상의 모든학원</span><br>우리 동네에서 찾다</h1><p>전국 지역별·과목별 학원 정보를 한곳에서.<br>동네 이름으로 우리 아이에게 딱 맞는 학원을 만나보세요.</p><div class="stat"><div><b>${totalCenter}</b>등록 학원</div><div><b>${totalDong}</b>동네</div><div><b>${sidos.length}</b>시·도</div></div><div class="herobtns"><a class="hcall" href="tel:${PHONE_TEL}">📞 ${PHONE}</a><button class="hinq" onclick="openInq()">✉️ 문의하기</button></div></div>
+  const springHoles = Array.from({length:9},(_,i)=>`<span style="top:${36+i*64}px"></span>`).join("");
+  const body=`<div class="hero"><div class="springbar">${springHoles}</div><span class="deco d1">📚</span><span class="deco d2">🎓</span><span class="deco d3">📐</span><div class="herobadge">✏️ 전국 ${totalDong}개 동네 · ${totalCenter}개 학원 정보</div><h1>우리 아이 공부,<br><span class="accent">세상의 모든학원</span><span class="pencil">📚</span><span class="sub2">동네에서 찾는 맞춤 학습</span></h1><p>전국 지역별·과목별 학원 정보를 한곳에서. 동네 이름으로 우리 아이에게 딱 맞는 학원을 만나보세요.</p><div class="stat"><div><b>${totalCenter}</b>등록 학원</div><div><b>${totalDong}</b>동네</div><div><b>${sidos.length}</b>시·도</div></div><div class="herobtns"><a class="hcall" href="tel:${PHONE_TEL}">📞 ${PHONE}</a><button class="hinq" onclick="openInq()">✉️ 문의하기</button></div></div>
 
-<section class="sec"><h2>과목별 학원</h2><p class="subt">국어·영어·수학·과학·사회, 초·중·고 전 과목 학원 정보를 안내합니다.</p><div class="subjgrid">${subjCards}</div></section>
+<section class="sec"><h2>📚 과목별 학원</h2><p class="subt">국어·영어·수학·과학·사회, 초·중·고 전 과목 학원 정보를 안내합니다.</p><div class="subjgrid">${subjCards}</div></section>
 
 <section class="howto"><h2>이렇게 찾으세요</h2><div class="steps3">
 <div class="s3"><div class="s3n">1</div><div class="s3t">지역 선택</div><div class="s3d">시·도 → 시군구 → 동네 순으로 우리 동네를 찾습니다.</div></div>
@@ -841,9 +874,9 @@ function pageHome(){
 <div class="s3"><div class="s3n">3</div><div class="s3t">전화·문의 상담</div><div class="s3d">전화나 문의하기로 학습 상담을 받아보세요.</div></div>
 </div></section>
 
-<section class="sec"><h2>인기 지역 바로가기</h2><p class="subt">학원이 많은 동네를 빠르게 확인하세요.</p><div class="popgrid">${popChips}</div></section>
+<section class="sec"><h2>📍 인기 지역 바로가기</h2><p class="subt">학원이 많은 동네를 빠르게 확인하세요.</p><div class="popgrid">${popChips}</div></section>
 
-<section class="sec"><h2>지역으로 찾기</h2><p class="subt">시·도를 선택하면 시군구·동네별 학원 정보를 볼 수 있습니다.</p><div class="lgrid">${grid}</div></section>
+<section class="sec"><h2>🗺️ 지역으로 찾기</h2><p class="subt">시·도를 선택하면 시군구·동네별 학원 정보를 볼 수 있습니다.</p><div class="lgrid">${grid}</div></section>
 
 <section class="why"><h2>세상의 모든학원, 이런 점이 좋아요</h2><div class="whygrid">
 <div class="whyitem"><span class="whyic">🗺️</span><b>동네 단위 검색</b><p>전국 ${totalDong}개 동네의 학원 정보를 지역별로 정리했습니다.</p></div>
