@@ -413,6 +413,8 @@ ${FLOATING}
 ${INQUIRY_MODAL}
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script>${INQUIRY_JS}</script>
+<script type="text/javascript" src="//wcs.pstatic.net/wcslog.js"></script>
+<script type="text/javascript">if(!window.wcs_add)var wcs_add={};wcs_add["wa"]="1ad8855f18c3dd0";if(window.wcs){wcs_do();}</script>
 </body></html>`;
 }
 
