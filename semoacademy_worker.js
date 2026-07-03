@@ -415,6 +415,7 @@ ${INQUIRY_MODAL}
 <script>${INQUIRY_JS}</script>
 <script type="text/javascript" src="//wcs.pstatic.net/wcslog.js"></script>
 <script type="text/javascript">if(!window.wcs_add)var wcs_add={};wcs_add["wa"]="1ad8855f18c3dd0";if(window.wcs){wcs_do();}</script>
+<script>(function(){function t(ty){try{fetch("/api/track",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:ty,page:location.pathname,ref:document.referrer})});}catch(e){}}document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a,button");if(!a)return;var h=(a.getAttribute&&a.getAttribute("href"))||"";if(h.indexOf("tel:")===0)t("tel");else if(h.indexOf("sms:")===0)t("sms");else if(a.className&&(""+a.className).indexOf("inqsubmit")>=0)t("contact");},true);})();</script>
 </body></html>`;
 }
 
@@ -1036,9 +1037,11 @@ function html(s){ return new Response(s,{headers:{"content-type":"text/html; cha
 function notFound(){ return new Response(layout({title:`페이지를 찾을 수 없습니다 | ${SITE_NAME}`,desc:"",canonical:SITE_URL+"/",jsonld:"",body:`<h1>페이지를 찾을 수 없습니다</h1><p class="subt">요청하신 페이지가 없습니다. <a href="/" style="color:var(--accent)">홈으로 돌아가기</a></p>`}),{status:404,headers:{"content-type":"text/html; charset=utf-8"}}); }
 
 // ---------- 라우터 ----------
-async function handle(request){
+async function handle(request, env){
   const url=new URL(request.url);
   let path=decodeURIComponent(url.pathname).replace(/\/$/,"")||"/";
+  if(path==="/api/track"&&request.method==="POST"){try{const b=await request.json();const ip=request.headers.get("CF-Connecting-IP")||"";const ts=new Date().toISOString();if(env&&env.DB&&(b.type==="tel"||b.type==="sms"||b.type==="contact")){await env.DB.prepare("INSERT INTO events (site,type,page,ref,ip,ts) VALUES (?,?,?,?,?,?)").bind("semoacademy",b.type,(b.page||"").slice(0,300),(b.ref||"").slice(0,120),ip,ts).run();}}catch(e){}return new Response(JSON.stringify({ok:true}),{headers:{"Content-Type":"application/json","Access-Control-Allow-Origin":"*"}});}
+  if(path==="/api/track"&&request.method==="OPTIONS")return new Response(null,{headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"POST,OPTIONS","Access-Control-Allow-Headers":"Content-Type"}});
   if(path==="/") return html(pageHome());
   if(path==="/robots.txt") return robots();
   if(path==="/sitemap.xml") return sitemap();
@@ -1064,4 +1067,4 @@ async function handle(request){
   if(m){ const dong=slug2dong()[m[1]]; if(dong){ const ch=idx.byDong[dong]; if(ch) return html(pageDong(dong,ch)); } return notFound(); }
   return notFound();
 }
-export default { async fetch(request){ try{ return await handle(request); }catch(e){ return new Response("Error: "+e.message+"\n"+e.stack,{status:500}); } } };
+export default { async fetch(request, env){ try{ return await handle(request, env); }catch(e){ return new Response("Error: "+e.message+"\n"+e.stack,{status:500}); } } };
