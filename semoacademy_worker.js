@@ -415,7 +415,7 @@ ${INQUIRY_MODAL}
 <script>${INQUIRY_JS}</script>
 <script type="text/javascript" src="//wcs.pstatic.net/wcslog.js"></script>
 <script type="text/javascript">if(!window.wcs_add)var wcs_add={};wcs_add["wa"]="1ad8855f18c3dd0";if(window.wcs){wcs_do();}</script>
-</body></html>`;
+<script>(function(){function t(y){try{fetch("/api/track",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:y,page:location.pathname,ref:document.referrer}),keepalive:true});}catch(e){}}document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a,button");if(!a)return;var h=(a.getAttribute&&a.getAttribute("href"))||"";if(h.indexOf("tel:")===0)t("tel");else if(a.className&&(""+a.className).indexOf("inqsubmit")>=0)t("contact");},true);})();</script></body></html>`;
 }
 
 // 로고 SVG (둥근 사각 + 흰 세모)
@@ -1037,9 +1037,79 @@ function html(s){ return new Response(s,{headers:{"content-type":"text/html; cha
 function notFound(){ return new Response(layout({title:`페이지를 찾을 수 없습니다 | ${SITE_NAME}`,desc:"",canonical:SITE_URL+"/",jsonld:"",body:`<h1>페이지를 찾을 수 없습니다</h1><p class="subt">요청하신 페이지가 없습니다. <a href="/" style="color:var(--accent)">홈으로 돌아가기</a></p>`}),{status:404,headers:{"content-type":"text/html; charset=utf-8"}}); }
 
 // ---------- 라우터 ----------
-async function handle(request){
+/* ─── 텔레그램 전환 알림 (템플릿 적용) ─── */
+const TG_TOKEN = '8101954996:AAGNV225WaNL8Zqh9OxtmP1WNzlbquNaq9s';
+const TG_CHAT  = '8649422714';
+const TG_LABEL = { tel: '전화 버튼 클릭', contact: '상담 버튼 클릭' };
+const TG_SITE   = '세상의모든학원';
+const TG_DOMAIN = 'semoacademy.com';
+const TG_ORIGIN = 'https://semoacademy.com';
+function tgDescribe(path) {
+  const seg = String(path || '').split('?')[0].split('/').filter(Boolean);
+  if (!seg.length) return '메인';
+  const p0 = seg[0];
+  if (p0 === 'regions') return '지역 목록';
+  if (p0 === 'region') { const s = (typeof slug2sido === 'function' ? slug2sido()[seg[1]] : null); return s ? (s + ' 지역') : '지역 페이지'; }
+  if (p0 === 'center') { const c = CENTERS.find(x => String(x.id) === String(seg[1])); return c ? (c.name + ' (' + c.dong + ')') : '센터 상세'; }
+  const dong = slug2dong()[p0];
+  if (dong) {
+    if (seg[1]) { const mm = seg[1].match(/^([a-z]+)-([a-z]+)$/); if (mm) { const lv = EN_LV[mm[1]], subj = EN_SUBJ[mm[2]]; if (lv && subj) return dong + ' · ' + lv + ' · ' + subj; } }
+    return dong + ' 학원';
+  }
+  return '일반 페이지';
+}
+function tgRef(ref) {
+  if (!ref) return '직접 방문 또는 알 수 없음';
+  try {
+    const h = new URL(ref).hostname.replace(/^www\./, '');
+    if (h === TG_DOMAIN || h.endsWith('.' + TG_DOMAIN)) return '사이트 내부 이동';
+    if (h.includes('naver')) return '네이버';
+    if (h.includes('google')) return '구글';
+    if (h.includes('daum')) return '다음';
+    if (h.includes('bing')) return 'Bing';
+    if (h.includes('kakao')) return '카카오';
+    if (h.includes('instagram')) return '인스타그램';
+    if (h.includes('facebook')) return '페이스북';
+    if (h.includes('youtube')) return '유튜브';
+    if (h.includes('tiktok')) return '틱톡';
+    if (h.includes('zum')) return '줌';
+    return h;
+  } catch (e) { return '알 수 없음'; }
+}
+function tgTime() {
+  const d = new Date(Date.now() + 9 * 3600000);
+  const z = n => String(n).padStart(2, '0');
+  return d.getUTCFullYear() + '-' + z(d.getUTCMonth() + 1) + '-' + z(d.getUTCDate()) +
+    ' ' + z(d.getUTCHours()) + ':' + z(d.getUTCMinutes());
+}
+const TG_BOT_RE = /bot|crawl|spider|slurp|facebookexternalhit|curl|wget|python|axios|headless|lighthouse|pagespeed|semrush|ahrefs|bytespider|applebot|monitor|uptime|scan/i;
+async function tgNotify(type, page, ref, ua) {
+  if (!TG_TOKEN || TG_TOKEN.indexOf('PASTE_') === 0) return;
+  if (!TG_CHAT || TG_CHAT.indexOf('PASTE_') === 0) return;
+  const label = TG_LABEL[type];
+  if (!label) return;
+  const L = [];
+  L.push((type === 'tel' ? '📞 ' : '📝 ') + label);
+  L.push('');
+  L.push('사이트: ' + TG_SITE + ' (' + TG_DOMAIN + ')');
+  L.push('페이지: ' + TG_ORIGIN + page);
+  L.push('한글: ' + tgDescribe(page));
+  L.push('유입: ' + tgRef(ref));
+  L.push('기기: ' + (/Mobile|Android|iPhone|iPad/i.test(ua || '') ? '모바일' : 'PC'));
+  L.push('시각: ' + tgTime() + ' (KST)');
+  try {
+    await fetch('https://api.telegram.org/bot' + TG_TOKEN + '/sendMessage', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: TG_CHAT, text: L.join('\n'), disable_web_page_preview: true })
+    });
+  } catch (e) { }
+}
+
+async function handle(request, env, ctx){
   const url=new URL(request.url);
   let path=decodeURIComponent(url.pathname).replace(/\/$/,"")||"/";
+  if(path==="/api/track"&&request.method==="POST"){try{const b=await request.json();const ua=request.headers.get("User-Agent")||"";if(!TG_BOT_RE.test(ua)&&TG_LABEL[b.type]){const _tg=tgNotify(b.type,(b.page||"/").slice(0,300),b.ref||"",ua);if(ctx&&ctx.waitUntil)ctx.waitUntil(_tg);else await _tg;}}catch(e){}return new Response(JSON.stringify({ok:true}),{headers:{"content-type":"application/json","access-control-allow-origin":"*"}});}
+  if(path==="/api/track"&&request.method==="OPTIONS")return new Response(null,{headers:{"access-control-allow-origin":"*","access-control-allow-methods":"POST,OPTIONS","access-control-allow-headers":"Content-Type"}});
   if(path==="/") return html(pageHome());
   if(path==="/robots.txt") return robots();
   if(path==="/sitemap.xml") return sitemap();
@@ -1065,4 +1135,4 @@ async function handle(request){
   if(m){ const dong=slug2dong()[m[1]]; if(dong){ const ch=idx.byDong[dong]; if(ch) return html(pageDong(dong,ch)); } return notFound(); }
   return notFound();
 }
-export default { async fetch(request){ try{ return await handle(request); }catch(e){ return new Response("Error: "+e.message+"\n"+e.stack,{status:500}); } } };
+export default { async fetch(request, env, ctx){ try{ return await handle(request, env, ctx); }catch(e){ return new Response("Error: "+e.message+"\n"+e.stack,{status:500}); } } };
