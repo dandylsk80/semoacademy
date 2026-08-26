@@ -1038,8 +1038,6 @@ function notFound(){ return new Response(layout({title:`페이지를 찾을 수 
 
 // ---------- 라우터 ----------
 /* ─── 텔레그램 전환 알림 (템플릿 적용) ─── */
-const TG_TOKEN = '8101954996:AAGNV225WaNL8Zqh9OxtmP1WNzlbquNaq9s';
-const TG_CHAT  = '8649422714';
 const TG_LABEL = { tel: '전화 버튼 클릭', sms: '문자 버튼 클릭', contact: '상담 버튼 클릭' };
 const TG_SITE   = '세상의모든학원';
 const TG_DOMAIN = 'semoacademy.com';
@@ -1083,9 +1081,10 @@ function tgTime() {
     ' ' + z(d.getUTCHours()) + ':' + z(d.getUTCMinutes());
 }
 const TG_BOT_RE = /bot|crawl|spider|slurp|facebookexternalhit|curl|wget|python|axios|headless|lighthouse|pagespeed|semrush|ahrefs|bytespider|applebot|monitor|uptime|scan/i;
-async function tgNotify(type, page, ref, ua) {
-  if (!TG_TOKEN || TG_TOKEN.indexOf('PASTE_') === 0) return;
-  if (!TG_CHAT || TG_CHAT.indexOf('PASTE_') === 0) return;
+async function tgNotify(env, type, page, ref, ua) {
+  const TG_TOKEN = env && env.TG_TOKEN;
+  const TG_CHAT = env && env.TG_CHAT;
+  if (!TG_TOKEN || !TG_CHAT) return;
   const label = TG_LABEL[type];
   if (!label) return;
   const L = [];
@@ -1108,7 +1107,7 @@ async function tgNotify(type, page, ref, ua) {
 async function handle(request, env, ctx){
   const url=new URL(request.url);
   let path=decodeURIComponent(url.pathname).replace(/\/$/,"")||"/";
-  if(path==="/api/track"&&request.method==="POST"){try{const b=await request.json();const ua=request.headers.get("User-Agent")||"";if(!TG_BOT_RE.test(ua)&&TG_LABEL[b.type]){const _tg=tgNotify(b.type,(b.page||"/").slice(0,300),b.ref||"",ua);if(ctx&&ctx.waitUntil)ctx.waitUntil(_tg);else await _tg;}}catch(e){}return new Response(JSON.stringify({ok:true}),{headers:{"content-type":"application/json","access-control-allow-origin":"*"}});}
+  if(path==="/api/track"&&request.method==="POST"){try{const b=await request.json();const ua=request.headers.get("User-Agent")||"";if(!TG_BOT_RE.test(ua)&&TG_LABEL[b.type]){const _tg=tgNotify(env, b.type,(b.page||"/").slice(0,300),b.ref||"",ua);if(ctx&&ctx.waitUntil)ctx.waitUntil(_tg);else await _tg;}}catch(e){}return new Response(JSON.stringify({ok:true}),{headers:{"content-type":"application/json","access-control-allow-origin":"*"}});}
   if(path==="/api/track"&&request.method==="OPTIONS")return new Response(null,{headers:{"access-control-allow-origin":"*","access-control-allow-methods":"POST,OPTIONS","access-control-allow-headers":"Content-Type"}});
   if(path==="/") return html(pageHome());
   if(path==="/robots.txt") return robots();
