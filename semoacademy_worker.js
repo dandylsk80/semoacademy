@@ -1047,11 +1047,11 @@ function tgDescribe(path) {
   if (!seg.length) return '메인';
   const p0 = seg[0];
   if (p0 === 'regions') return '지역 목록';
-  if (p0 === 'region') { const s = (typeof slug2sido === 'function' ? slug2sido()[seg[1]] : null); return s ? (s + ' 지역') : '지역 페이지'; }
-  if (p0 === 'center') { const c = CENTERS.find(x => String(x.id) === String(seg[1])); return c ? (c.name + ' (' + c.dong + ')') : '센터 상세'; }
+  if (p0 === 'region') { const s = (typeof slug2sido === 'function' ? slug2sido()[seg[1]] : null); return s ? (s + ' 학원') : '지역 페이지'; }
+  if (p0 === 'center') { const c = CENTERS.find(x => String(x.id) === String(seg[1])); return c ? (c.dong + ' 학원 · ' + c.name) : '센터 상세'; }
   const dong = slug2dong()[p0];
   if (dong) {
-    if (seg[1]) { const mm = seg[1].match(/^([a-z]+)-([a-z]+)$/); if (mm) { const lv = EN_LV[mm[1]], subj = EN_SUBJ[mm[2]]; if (lv && subj) return dong + ' · ' + lv + ' · ' + subj; } }
+    if (seg[1]) { const mm = seg[1].match(/^([a-z]+)-([a-z]+)$/); if (mm) { const lv = EN_LV[mm[1]], subj = EN_SUBJ[mm[2]]; if (lv && subj) return dong + ' ' + lv + ' ' + subj + ' 학원'; } }
     return dong + ' 학원';
   }
   return '일반 페이지';
@@ -1092,7 +1092,7 @@ async function tgNotify(env, type, page, ref, ua) {
   L.push('');
   L.push('사이트: ' + TG_SITE + ' (' + TG_DOMAIN + ')');
   L.push('페이지: ' + TG_ORIGIN + page);
-  L.push('한글: ' + tgDescribe(page));
+  L.push('검색 키워드: ' + tgDescribe(page));
   L.push('유입: ' + tgRef(ref));
   L.push('기기: ' + (/Mobile|Android|iPhone|iPad/i.test(ua || '') ? '모바일' : 'PC'));
   L.push('시각: ' + tgTime() + ' (KST)');
