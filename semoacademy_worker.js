@@ -1107,7 +1107,7 @@ async function tgNotify(env, type, page, ref, ua) {
 async function handle(request, env, ctx){
   const url=new URL(request.url);
   let path=decodeURIComponent(url.pathname).replace(/\/$/,"")||"/";
-  if(path==="/api/track"&&request.method==="POST"){try{const b=await request.json();const ua=request.headers.get("User-Agent")||"";if(!TG_BOT_RE.test(ua)&&TG_LABEL[b.type]){const _tg=tgNotify(env, b.type,(b.page||"/").slice(0,300),b.ref||"",ua);if(ctx&&ctx.waitUntil)ctx.waitUntil(_tg);else await _tg;}}catch(e){}return new Response(JSON.stringify({ok:true}),{headers:{"content-type":"application/json","access-control-allow-origin":"*"}});}
+  if(path==="/api/track"&&request.method==="POST"){try{const b=await request.json();const ua=request.headers.get("User-Agent")||"";if(!TG_BOT_RE.test(ua)&&TG_LABEL[b.type]){const _tg=tgNotify(env, b.type,(b.page||"/").slice(0,300),b.ref||"",ua);if(ctx&&ctx.waitUntil)ctx.waitUntil(_tg);else await _tg;}const ip=request.headers.get("CF-Connecting-IP")||"";const ts=new Date().toISOString();if(env&&env.DB&&(b.type==="tel"||b.type==="sms"||b.type==="contact"||b.type==="view")){await env.DB.prepare("INSERT INTO events (site,type,page,ref,ip,ts) VALUES (?,?,?,?,?,?)").bind("semoacademy",b.type,(b.page||"").slice(0,300),(b.ref||"").slice(0,120),ip,ts).run();}}catch(e){}return new Response(JSON.stringify({ok:true}),{headers:{"content-type":"application/json","access-control-allow-origin":"*"}});}
   if(path==="/api/track"&&request.method==="OPTIONS")return new Response(null,{headers:{"access-control-allow-origin":"*","access-control-allow-methods":"POST,OPTIONS","access-control-allow-headers":"Content-Type"}});
   if(path==="/") return html(pageHome());
   if(path==="/robots.txt") return robots();
