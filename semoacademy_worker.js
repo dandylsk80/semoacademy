@@ -415,7 +415,7 @@ ${INQUIRY_MODAL}
 <script>${INQUIRY_JS}</script>
 <script type="text/javascript" src="//wcs.pstatic.net/wcslog.js"></script>
 <script type="text/javascript">if(!window.wcs_add)var wcs_add={};wcs_add["wa"]="1ad8855f18c3dd0";if(window.wcs){wcs_do();}</script>
-<script>(function(){function t(y){try{fetch("/api/track",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:y,page:location.pathname,ref:document.referrer}),keepalive:true});}catch(e){}}document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a,button");if(!a)return;var h=(a.getAttribute&&a.getAttribute("href"))||"";if(h.indexOf("tel:")===0)t("tel");else if(a.className&&(""+a.className).indexOf("inqsubmit")>=0)t("contact");},true);})();</script></body></html>`;
+<script>(function(){function t(y){try{fetch("/api/track",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:y,page:location.pathname,ref:document.referrer}),keepalive:true});}catch(e){}}if(location.pathname.indexOf("/api/")!==0)t("view");document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a,button");if(!a)return;var h=(a.getAttribute&&a.getAttribute("href"))||"";if(h.indexOf("tel:")===0)t("tel");else if(a.className&&(""+a.className).indexOf("inqsubmit")>=0)t("contact");},true);})();</script></body></html>`;
 }
 
 // 로고 SVG (둥근 사각 + 흰 세모)
