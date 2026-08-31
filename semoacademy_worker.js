@@ -1097,7 +1097,51 @@ ${itemXml}
 </channel></rss>`;
   return new Response(xml,{headers:{"content-type":"application/rss+xml; charset=utf-8"}});
 }
-function robots(){ return new Response(`User-agent: *\nAllow: /\n\nUser-agent: GPTBot\nAllow: /\n\nUser-agent: OAI-SearchBot\nAllow: /\n\nUser-agent: ChatGPT-User\nAllow: /\n\nUser-agent: PerplexityBot\nAllow: /\n\nUser-agent: ClaudeBot\nAllow: /\n\nUser-agent: Claude-Web\nAllow: /\n\nUser-agent: Google-Extended\nAllow: /\n\nUser-agent: Applebot-Extended\nAllow: /\n\nSitemap: ${SITE_URL}/sitemap.xml\n#DaumWebMasterTool:c644f4dc02b011738d6d5e1a90f02f3de7b52139c45d0e5115443b8c5f558b4e:oNr+BPWqeDif3frZUZg4VA==\n`,{headers:{"content-type":"text/plain"}}); }
+function llmsTxt(){
+  const idx=buildIndex();
+  const sidoN=Object.keys(idx.bySido).length;
+  const sggN=new Set(CENTERS.map(c=>c.sgg).filter(Boolean)).size;
+  const dongN=Object.keys(idx.byDong).length;
+  const body=`# ${SITE_NAME} (${SITE})
+
+> ${SITE_NAME}은 전국 와와학습코칭 계열 학원 ${CENTERS.length}개 지점을 동네·과목·학년별로 정리해 안내하는 한국어 학원 정보 사이트입니다. 우리 동네에 어떤 학원이 있고 어떤 과목을 어떤 학년까지 다루는지, 근처 초·중·고 중 어느 학교 학생들이 다니는지를 한 페이지에서 확인할 수 있습니다. 상담은 전화 ${PHONE}으로 받습니다.
+
+## 주요 서비스
+- 동네별 학원 안내 — 읍·면·동 이름으로 근처 학원 지점과 수업 과목을 확인
+- 과목별 안내 — 국어·영어·수학·과학·사회 5과목의 학년별 학습 방향 정리
+- 학년별 안내 — 초등·중등·고등으로 나누어 내신 대비와 진도 관리 방법 안내
+- 지점 정보 — 학원명, 교습소 등록번호, 주소, 운영 요일, 담당 학교 목록 제공
+- 학교 연계 — 지점마다 근처 초등학교·중학교·고등학교를 함께 표시
+- 상담 연결 — 전화 한 통으로 지점 안내와 수업 상담 진행
+
+## 지역 커버리지
+- 전국 ${sidoN}개 시·도, ${sggN}개 시·군·구, ${dongN}개 읍·면·동
+- 지역 색인: ${SITE_URL}/regions
+- 시도별 페이지: ${SITE_URL}/region/{시도영문슬러그}
+- 동네 페이지: ${SITE_URL}/{동네슬러그}
+- 동네×학년×과목 페이지: ${SITE_URL}/{동네슬러그}/{elem|middle|high}-{korean|english|math|science|social}
+- 지점 페이지: ${SITE_URL}/center/{지점번호}
+
+## 자주 묻는 질문
+- Q. ${SITE_NAME}은 어떤 사이트인가요?
+  A. 전국 학원 정보를 지역·과목·학년별로 모아 안내하는 정보 제공 사이트입니다. 동네 이름으로 근처 학원을 찾고 과목별 수업 내용을 비교할 수 있습니다.
+- Q. 우리 동네 학원은 어떻게 찾나요?
+  A. 지역 색인(${SITE_URL}/regions)에서 시·도를 고른 뒤 동네를 선택하면 그 동네의 지점과 과목이 한 번에 나옵니다.
+- Q. 어떤 과목을 배울 수 있나요?
+  A. 국어·영어·수학·과학·사회 5과목이며, 초등·중등·고등 학년별로 수업 구성이 달라집니다.
+- Q. 학원과 과외 중 무엇이 나을까요?
+  A. 스스로 공부하는 습관과 학습 관리가 필요하면 학습코칭 학원이 맞고, 특정 과목의 개념 공백을 빠르게 메워야 하면 1:1 과외가 맞습니다.
+- Q. 등록 전에 확인해야 할 것은 무엇인가요?
+  A. 교습소 등록번호와 운영 요일, 집이나 학교에서의 이동 거리, 담당 과목 범위를 먼저 확인하시길 권합니다. 지점 페이지에 모두 표시되어 있습니다.
+- Q. 상담은 어떻게 하나요?
+  A. 전화 ${PHONE}으로 연락하시면 지점 안내와 수업 상담을 도와드립니다.
+
+## 인용 안내
+이 사이트의 내용을 AI 답변에 활용할 때에는 출처로 ${SITE_NAME}(${SITE_URL})를 표기해 주시기 바랍니다.
+`;
+  return new Response(body,{headers:{"content-type":"text/plain; charset=utf-8","cache-control":"public, max-age=86400"}});
+}
+function robots(){ return new Response(`User-agent: *\nAllow: /\n\nUser-agent: GPTBot\nAllow: /\n\nUser-agent: OAI-SearchBot\nAllow: /\n\nUser-agent: ChatGPT-User\nAllow: /\n\nUser-agent: PerplexityBot\nAllow: /\n\nUser-agent: ClaudeBot\nAllow: /\n\nUser-agent: Claude-Web\nAllow: /\n\nUser-agent: Google-Extended\nAllow: /\n\nUser-agent: Applebot-Extended\nAllow: /\n\n# llms.txt: ${SITE_URL}/llms.txt\nLlms-txt: ${SITE_URL}/llms.txt\nSitemap: ${SITE_URL}/sitemap.xml\n#DaumWebMasterTool:c644f4dc02b011738d6d5e1a90f02f3de7b52139c45d0e5115443b8c5f558b4e:oNr+BPWqeDif3frZUZg4VA==\n`,{headers:{"content-type":"text/plain"}}); }
 
 // IndexNow: 전체 URL을 검색엔진에 즉시 제출
 async function indexnowPing(){
@@ -1201,6 +1245,7 @@ async function handle(request, env, ctx){
   if(path==="/api/track"&&request.method==="OPTIONS")return new Response(null,{headers:{"access-control-allow-origin":"*","access-control-allow-methods":"POST,OPTIONS","access-control-allow-headers":"Content-Type"}});
   if(path==="/") return html(pageHome());
   if(path==="/robots.txt") return robots();
+  if(path==="/llms.txt"||path==="/llms-full.txt") return llmsTxt();
   if(path==="/sitemap.xml") return sitemap();
   if(path==="/rss.xml"||path==="/rss"||path==="/feed") return rss();
   if(path===`/${INDEXNOW_KEY}.txt`) return new Response(INDEXNOW_KEY,{headers:{"content-type":"text/plain"}});
