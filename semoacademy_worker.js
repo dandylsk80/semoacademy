@@ -1018,6 +1018,27 @@ function relatedChips(dong, subj, lv){
 }
 
 // ---------- 페이지: 동 ----------
+/* 주변 지역: 같은 시·군·구 → 같은 시·도 → (지점이 적은 시·도를 위해) 전국 순으로 12개를 채운다 */
+function nearbyDongs(sido, sgg, dong, limit){
+  const idx=buildIndex();
+  const out=[], seen=new Set([dong]);
+  const take=(bys,g,sd)=>{ for(const d of Array.from(bys[g]||[]).sort()){ if(seen.has(d)) continue; seen.add(d); out.push({d:d,g:g,s:sd}); if(out.length>=limit) return true; } return false; };
+  const mine=idx.bySido[sido]||{};
+  if(take(mine,sgg,sido)) return out;
+  for(const g of Object.keys(mine).sort()){ if(g===sgg) continue; if(take(mine,g,sido)) return out; }
+  for(const sd of Object.keys(idx.bySido).sort()){
+    if(sd===sido) continue;
+    const bys=idx.bySido[sd];
+    for(const g of Object.keys(bys).sort()){ if(take(bys,g,sd)) return out; }
+  }
+  return out;
+}
+function nearbyBlock(sido, sgg, dong){
+  const list=nearbyDongs(sido,sgg,dong,12);
+  if(!list.length) return "";
+  const links=list.map(o=>`<a href="${urlDong(o.d)}">${esc(o.d)}<small>${esc(o.s===sido?o.g:o.s+" "+o.g)}</small></a>`).join("");
+  return `<section class="sec"><h2>주변 지역</h2><p class="subt">${esc(sido)}를 비롯한 다른 동네도 확인해 보세요.</p><div class="lgrid">${links}</div></section>`;
+}
 function pageDong(dong, chere){
   const idx=buildIndex(); const sgg=chere[0].sgg; const sido=chere[0].sido;
   const alias=centerAlias(chere); const areatype=centerAreatype(chere);
@@ -1032,7 +1053,7 @@ function pageDong(dong, chere){
   const canonical=SITE_URL+urlDong(dong);
   const desc=alias?`${sgg} ${dong}(${alias}) 학원 정보. ${alias} 과목별·학년별 학원 안내.`:`${sgg} ${dong} 학원 정보. ${dong} 지역 과목별·학년별 학원 안내와 인근 학교 내신 대비 정보를 확인하세요.`;
   const thumb=thumbBlock(`dong|${dong}`, `${dong} 학원`, alias?`${sgg} ${dong} · ${alias}`:`${sido} ${sgg}`);
-  const body=`${thumb}<h1>${esc(dong)} 학원 정보</h1>${aliasBadge}${summary}<section class="sec"><h2>${esc(dong)} 과목·학년별 학원</h2>${lvBlocks}</section>${cards}<div class="note">정확한 수업 시간 및 교습비는 각 학원에 방문상담을 통해 확인하시기 바랍니다.</div>`;
+  const body=`${thumb}<h1>${esc(dong)} 학원 정보</h1>${aliasBadge}${summary}<section class="sec"><h2>${esc(dong)} 과목·학년별 학원</h2>${lvBlocks}</section>${cards}${nearbyBlock(sido,sgg,dong)}<div class="note">정확한 수업 시간 및 교습비는 각 학원에 방문상담을 통해 확인하시기 바랍니다.</div>`;
   const crumb=[{name:"홈",url:"/"},{name:sido,url:urlRegion(sido)},{name:dong}];
   const ttl=alias?`${dong} 학원 (${alias}) | ${sgg}`:`${dong} 학원 | ${sgg} 과목별 학원 정보`;
   return layout({title:ttl, desc, canonical, jsonld:"", body, crumb});
