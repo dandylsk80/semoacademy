@@ -1188,6 +1188,12 @@ function smLastmod(key){
   const periods = Math.floor((Date.now()/SM_DAY - off)/SM_PERIOD);
   return new Date((periods*SM_PERIOD + off)*SM_DAY).toISOString().slice(0,10);
 }
+/* RSS 정렬용 날짜: URL 마다 60일 주기로 밀린다. 매일 다른 1/60 묶음이 최신이 된다. */
+function rssRankDate(u){
+  const off = smHash(u) % 60;
+  const periods = Math.floor((Date.now()/SM_DAY - off)/60);
+  return new Date((periods*60 + off)*SM_DAY);
+}
 function sitemap(){
   const idx=buildIndex(); const urls=[`${SITE_URL}/`,`${SITE_URL}/list`,`${SITE_URL}/regions`];
   Object.keys(idx.bySido).forEach(s=>urls.push(SITE_URL+urlRegion(s)));
@@ -1229,6 +1235,8 @@ function rss(){
     const [d,s,l]=k.split("|"); const dt=pageDates(k);
     items.push({d,s,l,loc:SITE_URL+urlPage(d,s,l),mod:dt.modified,modStr:dt.modifiedStr,title:`${d} ${l}${s}학원`});
   });
+  /* 매일 도는 갱신일 기준으로 최근 50개 — 예전에는 고정 정렬이라 피드가 안 바뀌었다 */
+  items.forEach(it=>{ it.mod=rssRankDate(it.loc).getTime(); });
   items.sort((a,b)=>b.mod-a.mod);
   const top=items.slice(0,50);
   const now=new Date().toUTCString();
