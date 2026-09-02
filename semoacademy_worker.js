@@ -1394,4 +1394,8 @@ async function handle(request, env, ctx){
   if(m){ const dong=slug2dong()[m[1]]; if(dong){ const ch=idx.byDong[dong]; if(ch) return html(pageDong(dong,ch)); } return notFound(); }
   return notFound();
 }
-export default { async fetch(request, env, ctx){ try{ return await handle(request, env, ctx); }catch(e){ return new Response("Error: "+e.message+"\n"+e.stack,{status:500}); } } };
+export default {
+  /* 매일 1회 IndexNow 자동 제출 (cron 은 wrangler.toml [triggers]) */
+  async scheduled(event, env, ctx){ ctx.waitUntil(indexnowPing()); },
+  async fetch(request, env, ctx){ try{ return await handle(request, env, ctx); }catch(e){ return new Response("Error: "+e.message+"\n"+e.stack,{status:500}); } }
+};
