@@ -1180,6 +1180,14 @@ function pageRegions(){
 }
 
 // ---------- sitemap / robots ----------
+/* sitemap lastmod: 날짜 없는 정적·지역 URL 도 18일 주기로 분산해 채운다 */
+const SM_DAY = 86400000, SM_PERIOD = 18;
+function smHash(str){ let h=5381; const s=String(str); for(let i=0;i<s.length;i++) h=((h<<5)+h+s.charCodeAt(i))>>>0; return h; }
+function smLastmod(key){
+  const off = smHash(key) % SM_PERIOD;
+  const periods = Math.floor((Date.now()/SM_DAY - off)/SM_PERIOD);
+  return new Date((periods*SM_PERIOD + off)*SM_DAY).toISOString().slice(0,10);
+}
 function sitemap(){
   const idx=buildIndex(); const urls=[`${SITE_URL}/`,`${SITE_URL}/list`,`${SITE_URL}/regions`];
   Object.keys(idx.bySido).forEach(s=>urls.push(SITE_URL+urlRegion(s)));
@@ -1187,7 +1195,7 @@ function sitemap(){
   const dated=[];
   Object.keys(idx.pages).forEach(k=>{ const [d,s,l]=k.split("|"); const dt=pageDates(k); dated.push({loc:SITE_URL+urlPage(d,s,l),mod:dt.modifiedStr}); });
   CENTERS.forEach(c=>urls.push(SITE_URL+urlCenter(c.id)));
-  const plain=urls.map(u=>`<url><loc>${u}</loc></url>`).join("\n");
+  const plain=urls.map(u=>`<url><loc>${u}</loc><lastmod>${smLastmod(u)}</lastmod></url>`).join("\n");
   const withDate=dated.map(x=>`<url><loc>${x.loc}</loc><lastmod>${x.mod}</lastmod></url>`).join("\n");
   return new Response(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${plain}\n${withDate}\n</urlset>`,{headers:{"content-type":"application/xml; charset=utf-8"}});
 }
