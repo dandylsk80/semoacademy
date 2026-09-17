@@ -604,7 +604,7 @@ ${ldBlocks}
 <main class="wrap">${bc}${body}</main>
 <footer class="ft"><div class="wrap">
 <p class="ftname">${LOGO_SVG_SM} ${SITE_NAME}</p>
-<p class="ftlinks"><a href="/">홈</a> · <a href="/regions">전체 지역</a> · <a href="/list">전체 목록</a> · <a href="tel:${PHONE_TEL}">전화문의 ${PHONE}</a></p>
+<p class="ftlinks"><a href="/">홈</a> · <a href="/post/">학원 정보</a> · <a href="/regions">전체 지역</a> · <a href="/list">전체 목록</a> · <a href="tel:${PHONE_TEL}">전화문의 ${PHONE}</a></p>
 <p class="ftnote">전국 학원 정보를 지역·과목별로 안내하는 정보 제공 사이트입니다. 정확한 수업 시간 및 교습비는 지역별·과목별로 상이할 수 있으므로 각 학원에 방문상담을 통해 확인하시기 바랍니다.</p>
 <p class="ftcopy">© ${SITE_HOST}</p></div></footer>
 ${FLOATING}
@@ -1235,7 +1235,7 @@ function sitemap(){
   CENTERS.forEach(c=>urls.push(SITE_URL+urlCenter(c.id)));
   const plain=urls.map(u=>`<url><loc>${u}</loc><lastmod>${smLastmod(u)}</lastmod></url>`).join("\n");
   const withDate=dated.map(x=>`<url><loc>${x.loc}</loc><lastmod>${x.mod}</lastmod></url>`).join("\n");
-  return new Response(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${plain}\n${withDate}\n</urlset>`,{headers:{"content-type":"application/xml; charset=utf-8"}});
+  return new Response(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${postSitemapXml()}\n${plain}\n${withDate}\n</urlset>`,{headers:{"content-type":"application/xml; charset=utf-8"}});
 }
 /* 기존 RSS 를 Atom 으로 변환한다 (피드 항목 로직을 중복 구현하지 않기 위함) */
 function atomFromRss(xml, selfUrl){
@@ -1259,6 +1259,112 @@ function atomFromRss(xml, selfUrl){
   }
   return x+"</feed>";
 }
+
+/* ===================== 정보성 글 (/post) =====================
+   글은 공용 D1 posts 테이블에 있고 이 사이트는 자기 글(published)만 읽는다.
+   발행 전환은 allcarestudy 워커의 크론 한 곳에서만 한다.
+
+   목록은 메모리에 5분 캐시한다 — 사이트맵·RSS·목록이 매 요청 D1 을 치면
+   응답이 느려지고 D1 읽기도 낭비된다. 본문은 상세 요청에서만 읽는다.
+   사이트맵·RSS 생성 함수는 동기라 인자로 넘기지 않고 이 캐시를 직접 읽는다.
+   (라우터가 응답을 만들기 직전 await loadPosts(env) 로 채워 준다) */
+const POST_SITE = "semoacademy";
+const POST_ORIGIN = SITE_URL;
+const POST_TTL = 300000;
+let POSTS_CACHE = { at: 0, rows: [] };
+async function loadPosts(env) {
+  if (Date.now() - POSTS_CACHE.at < POST_TTL) return POSTS_CACHE.rows;
+  if (!env || !env.DB) return POSTS_CACHE.rows;
+  try {
+    const r = await env.DB.prepare(
+      "SELECT slug,title,summary,published_at FROM posts WHERE site=? AND status='published' ORDER BY published_at DESC LIMIT 200"
+    ).bind(POST_SITE).all();
+    POSTS_CACHE = { at: Date.now(), rows: r.results || [] };
+  } catch (e) { POSTS_CACHE = { at: Date.now(), rows: POSTS_CACHE.rows }; }
+  return POSTS_CACHE.rows;
+}
+async function getPost(env, slug) {
+  if (!env || !env.DB) return null;
+  try {
+    return await env.DB.prepare(
+      "SELECT slug,title,summary,body_html,published_at FROM posts WHERE site=? AND slug=? AND status='published'"
+    ).bind(POST_SITE, slug).first();
+  } catch (e) { return null; }
+}
+const postEsc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g,
+  (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const postDate = (p) => String((p && p.published_at) || "").slice(0, 10);
+
+/* 목록·상세 본문 — 사이트 CSS 에 의존하지 않도록 인라인 스타일만 쓴다.
+   바깥 컨테이너만 그 사이트의 클래스를 그대로 빌린다(고정 헤더 여백 때문). */
+function postCards(posts) {
+  if (!posts.length) return '<p style="color:#666">아직 등록된 글이 없습니다.</p>';
+  return posts.map((p) =>
+    '<a href="/post/' + postEsc(p.slug) + '/" style="display:block;background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:20px 22px;margin-bottom:12px">'
+    + '<div style="font-size:17px;font-weight:800;line-height:1.4">' + postEsc(p.title) + '</div>'
+    + '<p style="font-size:14px;color:#555;line-height:1.7;margin:8px 0 0">' + postEsc(p.summary || "") + '</p>'
+    + '<div style="font-size:12px;color:#999;margin-top:8px">' + postEsc(postDate(p)) + '</div></a>').join("");
+}
+function postArticle(p) {
+  return '<div style="font-size:12px;color:#999;margin-bottom:18px">' + postEsc(postDate(p)) + ' · 세상의모든학원</div>'
+    + '<div class="post-body" style="font-size:15px;line-height:1.85;color:#333">' + p.body_html + '</div>'
+    + '<style>.post-body h2{font-size:19px;font-weight:800;line-height:1.4;margin:32px 0 12px;color:#111}'
+    + '.post-body h3{font-size:16px;font-weight:700;margin:22px 0 8px;color:#111}'
+    + '.post-body p{margin:0 0 14px}</style>';
+}
+
+/* 사이트맵·RSS 조각 — lastmod·pubDate 는 실제 발행일을 쓴다
+   (지역 페이지처럼 해시로 돌리면 글의 신선도 신호가 사라진다) */
+function postSitemapXml() {
+  const ps = POSTS_CACHE.rows || [];
+  const top = ps.length ? postDate(ps[0]) : new Date().toISOString().slice(0, 10);
+  return '<url><loc>' + POST_ORIGIN + '/post/</loc><lastmod>' + top + '</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>'
+    + ps.map((p) => '<url><loc>' + POST_ORIGIN + '/post/' + p.slug + '/</loc><lastmod>' + postDate(p)
+      + '</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>').join("");
+}
+function postRssXml() {
+  return (POSTS_CACHE.rows || []).map((p) => {
+    const dt = p.published_at ? new Date(p.published_at) : new Date();
+    const u = POST_ORIGIN + '/post/' + postEsc(p.slug) + '/';
+    return '<item><title>' + postEsc(p.title) + '</title><link>' + u + '</link>'
+      + '<guid isPermaLink="true">' + u + '</guid><pubDate>' + dt.toUTCString() + '</pubDate>'
+      + '<description>' + postEsc(p.summary || p.title) + '</description></item>';
+  }).join("");
+}
+/* 캐시 무효화 토큰 — 사이트맵을 Cache API 에 넣는 사이트는 키에 이 값을 붙인다.
+   글이 늘거나 새로 발행되면 값이 바뀌어 하루짜리 캐시를 기다리지 않아도 된다. */
+function postVer() {
+  const ps = POSTS_CACHE.rows || [];
+  return ps.length ? ps.length + "-" + postDate(ps[0]) : "0";
+}
+/* IndexNow — 최근 7일 안에 발행된 글은 배치 앞에 실어 색인을 앞당긴다 */
+function postFreshUrls() {
+  const fresh = (POSTS_CACHE.rows || [])
+    .filter((p) => p.published_at && Date.now() - Date.parse(p.published_at) < 7 * 86400000)
+    .map((p) => POST_ORIGIN + '/post/' + p.slug + '/');
+  return fresh.length ? fresh.concat([POST_ORIGIN + '/post/']) : [];
+}
+
+function pagePostList(posts) {
+  const body = '<h1>학원 정보</h1>'
+    + '<p class="subt">학원을 고르고 옮기는 데 도움이 되는 글을 한 편씩 올립니다. 상담에서 볼 것, 반 배정, 옮길 시점 판단을 다룹니다.</p>'
+    + postCards(posts);
+  return layout({ title: `학원 정보 | ${SITE_NAME}`, desc: `학원을 고르고 이어 가는 데 필요한 정보를 정리했습니다. 상담에서 볼 것, 반 배정, 옮길 시점까지 세상의모든학원이 한 편씩 올리는 학원 선택 안내입니다.`,
+    canonical: SITE_URL + "/post/", jsonld: JSON.stringify({ "@context": "https://schema.org", "@type": "CollectionPage",
+      "name": "학원 정보", "url": SITE_URL + "/post/" }), body,
+    crumb: [{ name: "홈", url: "/" }, { name: "학원 정보" }] });
+}
+function pagePost(p) {
+  const u = SITE_URL + "/post/" + p.slug + "/";
+  const body = '<h1>' + postEsc(p.title) + '</h1>' + postArticle(p)
+    + '<p style="margin-top:26px"><a href="/post/">학원 정보 전체</a> · <a href="/list">전체 목록</a> · <a href="/regions">전체 지역</a></p>';
+  return layout({ title: `${p.title} | ${SITE_NAME}`, desc: (p.summary || p.title), canonical: u,
+    jsonld: JSON.stringify({ "@context": "https://schema.org", "@type": "BlogPosting", "headline": p.title, "url": u,
+      "datePublished": p.published_at || undefined, "dateModified": p.published_at || undefined, "inLanguage": "ko",
+      "author": { "@type": "Organization", "name": SITE_NAME }, "publisher": { "@type": "Organization", "name": SITE_NAME, "url": SITE_URL } }),
+    body, crumb: [{ name: "홈", url: "/" }, { name: "학원 정보", url: "/post/" }, { name: p.title }] });
+}
+
 function rss(){
   const idx=buildIndex();
   // 최근 수정일 기준 정렬해서 상위 50개
@@ -1284,7 +1390,7 @@ function rss(){
 <description>전국 지역별·과목별 학원 정보</description>
 <language>ko</language>
 <lastBuildDate>${now}</lastBuildDate>
-${itemXml}
+${postRssXml()}${itemXml}
 </channel></rss>`;
   return new Response(xml,{headers:{"content-type":"application/rss+xml; charset=utf-8"}});
 }
@@ -1477,6 +1583,7 @@ const ua=request.headers.get("User-Agent")||"";if(!TG_BOT_RE.test(ua)&&TG_LABEL[
   if(path==="/") return html(pageHome());
   if(path==="/robots.txt") return robots();
   if(path==="/llms.txt"||path==="/llms-full.txt") return llmsTxt();
+  if(path.startsWith("/sitemap")||path==="/rss.xml"||path==="/rss"||path==="/feed"||path==="/atom.xml"||path==="/atom") await loadPosts(env);   /* 사이트맵·RSS 는 동기 함수 */
   if(path==="/sitemap.xml") return sitemap();
   if(path==="/atom.xml"||path==="/atom") return new Response(atomFromRss(await (rss()).text(), SITE+"/atom.xml"),{headers:{"content-type":"application/atom+xml; charset=UTF-8","cache-control":"public, max-age=3600"}});
   if(path==="/rss.xml"||path==="/rss"||path==="/feed") return rss();
@@ -1488,6 +1595,13 @@ const ua=request.headers.get("User-Agent")||"";if(!TG_BOT_RE.test(ua)&&TG_LABEL[
   if(path==="/logo.png") return logoPng();
   if(path==="/list") return html(pageList());
   if(path==="/regions") return html(pageRegions());
+  /* 정보성 글 — 지역 슬러그 판정보다 앞에 둔다 */
+  if(path==="/post"||path.startsWith("/post/")){
+    if(path==="/post") return html(pagePostList(await loadPosts(env)));
+    const __s=path.slice(6);
+    if(__s && __s.indexOf("/")<0){ const __p=await getPost(env,__s); if(__p) return html(pagePost(__p)); }
+    return notFound();
+  }
   const idx=buildIndex();
   // /region/:sido
   let m=path.match(/^\/region\/([a-z]+)$/);
