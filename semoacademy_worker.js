@@ -717,6 +717,8 @@ body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;b
 @media(max-width:600px){.gnav-call{display:none}}
 /* 플로팅 버튼 */
 .floating{position:fixed;right:16px;bottom:20px;display:flex;flex-direction:column;gap:10px;z-index:50}
+/* 모바일: 하단 우측은 브라우저 툴바·홈 인디케이터·스크롤 동선과 겹쳐 오터치가 난다 → 화면 세로 중앙 우측으로 */
+@media(max-width:768px){.floating{top:50%;bottom:auto;transform:translateY(-50%);gap:12px}}
 .fbtn{width:58px;height:58px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.18);transition:transform .12s}
 .fbtn:hover{transform:scale(1.06)}
 .fbtn .fic{font-size:20px;line-height:1}
