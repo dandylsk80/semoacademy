@@ -190,7 +190,25 @@ function tkMeta(ua, ref, selfHost, qs){
    아웃바운드 IP 에 429(TooManyRequests)를 반환하는 경우가 많다. IndexNow 는 참여
    엔드포인트 한 곳만 성공하면 나머지 엔진으로 전파되므로 순차 폴백한다. */
 const INDEXNOW_FALLBACK_EPS = ["https://api.indexnow.org/indexnow","https://yandex.com/indexnow","https://search.seznam.cz/indexnow"];
+/* 네이버는 IndexNow 참여 엔드포인트지만 위 폴백 체인에 넣으면 안 된다 — 체인은 한 곳이
+   200 을 주는 순간 멈추므로 yandex 가 먼저 성공하면 네이버로는 영영 안 간다.
+   같은 본문을 체인 밖에서 따로 보내고 status 를 따로 남긴다.
+   루트 URL 하나만 담긴 배치는 422 "Invalid urls" 지만 하위 경로가 섞이면 200 이다(2026-09-21 실측). */
+const INDEXNOW_NAVER_EP = "https://searchadvisor.naver.com/indexnow";
+async function indexnowNaver(body){
+  try{
+    const r=await fetch(INDEXNOW_NAVER_EP,{method:"POST",headers:{"content-type":"application/json; charset=utf-8"},body});
+    return r.status;
+  }catch(e){ return 0; }
+}
+
 async function indexnowFetch(opt){
+  const naverP=indexnowNaver(opt&&opt.body);
+  const r=await indexnowFetchChain(opt);
+  try{ r.naver=await naverP; }catch(e){}
+  return r;
+}
+async function indexnowFetchChain(opt){
   let last=null;
   for(const ep of INDEXNOW_FALLBACK_EPS){
     try{
@@ -1462,7 +1480,7 @@ async function indexnowPing(){
   const payload={ host:SITE_HOST, key:INDEXNOW_KEY, keyLocation:`${SITE_URL}/${INDEXNOW_KEY}.txt`, urlList:urls };
   try{
     const resp=await indexnowFetch({ method:"POST", headers:{"Content-Type":"application/json; charset=utf-8"}, body:JSON.stringify(payload) });
-    return new Response(`IndexNow 제출 완료\n제출 URL 수: ${urls.length}\n응답 코드: ${resp.status}\n(200/202면 정상)`,{headers:{"content-type":"text/plain; charset=utf-8"}});
+    return new Response(`IndexNow 제출 완료\n제출 URL 수: ${urls.length}\n응답 코드: ${resp.status}\n네이버: ${resp.naver}\n(200/202면 정상)`,{headers:{"content-type":"text/plain; charset=utf-8"}});
   }catch(e){
     return new Response(`IndexNow 제출 실패: ${e.message}`,{status:500,headers:{"content-type":"text/plain; charset=utf-8"}});
   }
