@@ -605,7 +605,18 @@ function buildIndex(){
 }
 
 // ---------- 레이아웃 ----------
+
+/* 모든 페이지 <title> 을 "설명 | 사이트명" 하나로 정규화 (2026-10-08 사이트명 통일) */
+function siteTitle(t){
+  const N=SITE_NAME; const esc=N.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"); const SEP="(?:\\s*[-|·—–:]\\s*)";
+  let s=String(t||"").trim();
+  s=s.replace(new RegExp("^"+esc+SEP),"").replace(new RegExp(SEP+esc+"$"),"");
+  s=s.replace(/\s*\|\s*/g," — ").trim();
+  return (s?s+" | ":"")+N;
+}
 function layout({title,desc,canonical,jsonld,body,crumb}){
+  const T = siteTitle(title);
+  const siteLd = canonical===SITE_URL+"/" ? JSON.stringify({"@context":"https://schema.org","@type":"WebSite","name":SITE_NAME,"url":SITE_URL+"/","inLanguage":"ko-KR"}) : "";
   const bc = crumb? `<nav class="bc">${crumb.map((c,i)=> c.url?`<a href="${c.url}">${esc(c.name)}</a>`:`<span>${esc(c.name)}</span>`).join(' <i>›</i> ')}</nav>`:"";
   // 브레드크럼 JSON-LD
   let bcLd = "";
@@ -614,16 +625,16 @@ function layout({title,desc,canonical,jsonld,body,crumb}){
   }
   // 조직 + 로고 JSON-LD (구글·네이버 로고 노출용)
   const orgLd = JSON.stringify({"@context":"https://schema.org","@type":"Organization","name":SITE_NAME,"url":SITE_URL,"logo":SITE_URL+"/logo.png","telephone":"+82-10-6834-8080"});
-  const ldBlocks = [jsonld, bcLd, orgLd].filter(Boolean).map(j=>`<script type="application/ld+json">${j}</script>`).join("");
+  const ldBlocks = [jsonld, bcLd, orgLd, siteLd].filter(Boolean).map(j=>`<script type="application/ld+json">${j}</script>`).join("");
   return `<!DOCTYPE html><html lang="ko"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
+<title>${esc(T)}</title><meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${esc(canonical)}">
 <meta name="naver-site-verification" content="2d9a9391a355be8594029617bfd31e90ca1f9fcc" />
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<meta property="og:type" content="website"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:site_name" content="${SITE_NAME}"><meta property="og:image" content="${SITE_URL}/logo.png">
+<meta property="og:type" content="website"><meta property="og:title" content="${esc(T)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:site_name" content="${SITE_NAME}"><meta property="og:image" content="${SITE_URL}/logo.png">
 ${ldBlocks}
 <style>${CSS}</style></head><body>
 <header class="hd"><div class="wrap"><a href="/" class="logo">${LOGO_SVG}<span class="logotxt">세상의 모든학원</span></a><nav class="gnav"><a href="/regions">지역별</a><a href="tel:${PHONE_TEL}" class="gnav-call">📞 ${PHONE}</a></nav></div></header>
