@@ -299,6 +299,8 @@ const THUMBS = [
   "pexels-yaroslav-shuraev-9489804.jpg",
 ];
 const THUMB_DIR = "https://cdn.jsdelivr.net/gh/dandylsk80/semoacademy@main/image";
+// og:image — 1200×630 로고 카드 PNG (image/og/og-home.png). 카카오톡·네이버 미리보기 규격
+const OG_IMAGE = THUMB_DIR + "/og/og-home.png";
 function thumbFor(key){
   if(!THUMBS.length) return null;
   const rng = seedRng(key+"thumb");
@@ -634,7 +636,7 @@ function layout({title,desc,canonical,jsonld,body,crumb}){
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<meta property="og:type" content="website"><meta property="og:title" content="${esc(T)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:site_name" content="${SITE_NAME}"><meta property="og:image" content="${SITE_URL}/logo.png">
+<meta property="og:type" content="website"><meta property="og:title" content="${esc(T)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:site_name" content="${SITE_NAME}"><meta property="og:image" content="${OG_IMAGE}">
 ${ldBlocks}
 <style>${CSS}</style></head><body>
 <header class="hd"><div class="wrap"><a href="/" class="logo">${LOGO_SVG}<span class="logotxt">세상의 모든학원</span></a><nav class="gnav"><a href="/regions">지역별</a><a href="tel:${PHONE_TEL}" class="gnav-call">📞 ${PHONE}</a></nav></div></header>
