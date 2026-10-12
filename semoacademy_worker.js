@@ -271,7 +271,7 @@ const THUMBS = [
   "pexels-asia-culture-center-3116378-13916997.jpg",
   "pexels-chipi1189-33964549.jpg",
   "pexels-delot-18471480.jpg",
-  "pexels-doan-thanh-binh-2147604563-36887759.jpg",
+  "pexels-ron-lach-9871139.jpg",
   "pexels-enginakyurt-2946974.jpg",
   "pexels-hujason-29461083.jpg",
   "pexels-joshsorenson-990432.jpg",
