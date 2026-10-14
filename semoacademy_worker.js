@@ -639,11 +639,11 @@ function layout({title,desc,canonical,jsonld,body,crumb}){
 <meta property="og:type" content="website"><meta property="og:title" content="${esc(T)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:site_name" content="${SITE_NAME}"><meta property="og:image" content="${OG_IMAGE}">
 ${ldBlocks}
 <style>${CSS}</style></head><body>
-<header class="hd"><div class="wrap"><a href="/" class="logo">${LOGO_SVG}<span class="logotxt">세상의 모든학원</span></a><nav class="gnav"><a href="/regions">지역별</a><a href="tel:${PHONE_TEL}" class="gnav-call">📞 ${PHONE}</a></nav></div></header>
+<header class="hd"><div class="wrap"><a href="/" class="logo">${LOGO_SVG}<span class="logotxt">세상의 모든학원</span></a><nav class="gnav"><a href="/regions">지역별</a><a href="tel:${PHONE_TEL}" class="gnav-call">📞 ${PHONE}</a><span class="telt gnav-telt">📞 ${PHONE}</span></nav></div></header>
 <main class="wrap">${bc}${body}</main>
 <footer class="ft"><div class="wrap">
 <p class="ftname">${LOGO_SVG_SM} ${SITE_NAME}</p>
-<p class="ftlinks"><a href="/">홈</a> · <a href="/post/">학원 정보</a> · <a href="/regions">전체 지역</a> · <a href="/list">전체 목록</a> · <a href="tel:${PHONE_TEL}">전화문의 ${PHONE}</a></p>
+<p class="ftlinks"><a href="/">홈</a> · <a href="/post/">학원 정보</a> · <a href="/regions">전체 지역</a> · <a href="/list">전체 목록</a> · <a href="tel:${PHONE_TEL}">전화문의 ${PHONE}</a><span class="telt">전화문의 ${PHONE}</span></p>
 <p class="ftnote">전국 학원 정보를 지역·과목별로 안내하는 정보 제공 사이트입니다. 정확한 수업 시간 및 교습비는 지역별·과목별로 상이할 수 있으므로 각 학원에 방문상담을 통해 확인하시기 바랍니다.</p>
 <p class="ftcopy">© ${SITE_HOST}</p></div></footer>
 ${FLOATING}
@@ -661,7 +661,7 @@ const LOGO_SVG_SM = `<svg width="20" height="20" viewBox="0 0 40 40" style="vert
 
 // 플로팅 버튼 (전화/문자/문의)
 const FLOATING = `<div class="floating">
-<a href="tel:${PHONE_TEL}" class="fbtn fcall" aria-label="전화"><span class="fic">📞</span><span class="flbl">전화</span></a>
+<a href="tel:${PHONE_TEL}" class="fbtn fcall" aria-label="전화"><span class="fic">📞</span><span class="flbl">전화</span></a><span class="telt fbtn-telt">${PHONE}</span>
 <a href="sms:${PHONE_TEL}" class="fbtn fsms" aria-label="문자"><span class="fic">💬</span><span class="flbl">문자</span></a>
 <button class="fbtn finq" onclick="openInq()" aria-label="문의"><span class="fic">✉️</span><span class="flbl">문의</span></button>
 </div>`;
@@ -689,7 +689,7 @@ const INQUIRY_MODAL = `<div class="inqback" id="inqBack" onclick="if(event.targe
 </div>
 <div class="inqfield"><label>문의 내용</label><textarea id="iqMsg" rows="3" placeholder="궁금하신 점을 적어 주세요 (선택)"></textarea></div>
 <button class="inqsubmit" onclick="submitInq()">문의 보내기</button>
-<a href="tel:${PHONE_TEL}" class="inqcall">📞 바로 전화하기 ${PHONE}</a>
+<a href="tel:${PHONE_TEL}" class="inqcall">📞 바로 전화하기 ${PHONE}</a><span class="telt inq-telt">전화 ${PHONE}</span>
 <p class="inqnote" id="iqNote"></p>
 </div></div>`;
 
@@ -745,6 +745,14 @@ body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;b
 .gnav a{color:var(--sub);text-decoration:none;font-size:14.5px;font-weight:600}
 .gnav a:hover{color:var(--accent)}
 .gnav-call{color:var(--accent)!important;font-weight:700!important}
+/* PC(769px~)는 전화를 걸 수 없으니 tel: 버튼을 숨기고 번호를 일반 텍스트로 보인다. 모바일은 그대로 */
+.telt{display:none}
+@media(min-width:769px){a[href^="tel:"]{display:none!important}.telt{display:inline-flex;align-items:center}
+.gnav-telt{color:var(--accent);font-weight:700;white-space:nowrap}
+.herobtns .hcall-telt{color:var(--accent);font-weight:800;font-size:16px;padding:15px 6px;white-space:nowrap}
+.floating{align-items:flex-end}.fbtn-telt{background:#e8633a;color:#fff;font-weight:800;font-size:13px;padding:8px 13px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.18);white-space:nowrap}
+.cphone-telt{color:#fff;font-weight:800;font-size:14px;padding:12px 6px;white-space:nowrap}
+.inq-telt{width:100%;justify-content:center;margin-top:10px;font-weight:800;font-size:14px;color:var(--sub)}}
 @media(max-width:600px){.gnav-call{display:none}}
 /* 플로팅 버튼 */
 .floating{position:fixed;right:16px;bottom:20px;display:flex;flex-direction:column;gap:10px;z-index:50}
@@ -1022,7 +1030,7 @@ function pageSubject(dong, subj, lv, chere){
   const faqs = parseFaq(faqSec ? faqSec.p : "");
   const faqHtml = faqs.length ? `<section class="sec" id="faq"><h2>자주 묻는 질문</h2><div class="faq">${faqs.map(f=>`<details><summary><span class="q">Q. ${esc(f[0])}</span></summary><div class="a">${esc(f[1])}</div></details>`).join("")}</div></section>` : "";
   const related = relatedChips(dong, subj, lv);
-  const cta = `<div class="cta"><h2>${esc(dong)} ${esc(subj)} 학원, 더 알아보고 싶으신가요?</h2><p>전화 또는 문의 남기기로 ${esc(g)} ${esc(subj)} 학습 상담을 받아보세요.</p><div class="ctabtns"><a class="cphone" href="tel:${PHONE_TEL}">📞 ${PHONE}</a><button class="cinq" onclick="openInq()">✉️ 문의 남기기</button></div></div>`;
+  const cta = `<div class="cta"><h2>${esc(dong)} ${esc(subj)} 학원, 더 알아보고 싶으신가요?</h2><p>전화 또는 문의 남기기로 ${esc(g)} ${esc(subj)} 학습 상담을 받아보세요.</p><div class="ctabtns"><a class="cphone" href="tel:${PHONE_TEL}">📞 ${PHONE}</a><span class="telt cphone-telt">전화 ${PHONE}</span><button class="cinq" onclick="openInq()">✉️ 문의 남기기</button></div></div>`;
   const canonical = SITE_URL+urlPage(dong,subj,lv);
   const desc = alias
     ? `${sgg} ${dong}(${alias}) ${g} ${subj} 학원 정보. ${alias} ${subj}학원, 인근 학교 내신 대비와 ${subj} 학습 관리 안내.`
@@ -1179,7 +1187,7 @@ function pageHome(){
   const faqLd=JSON.stringify({"@context":"https://schema.org","@type":"FAQPage","mainEntity":homeFaqs.map(f=>({"@type":"Question","name":f[0],"acceptedAnswer":{"@type":"Answer","text":f[1]}}))});
 
   const springHoles = Array.from({length:9},(_,i)=>`<span style="top:${36+i*64}px"></span>`).join("");
-  const body=`<div class="hero"><div class="springbar">${springHoles}</div><span class="deco d1">📚</span><span class="deco d2">🎓</span><span class="deco d3">📐</span><div class="herobadge">✏️ 전국 ${totalDong}개 동네 · ${totalCenter}개 학원 정보</div><h1>우리 아이 공부,<br><span class="accent">세상의 모든학원</span><span class="pencil">📚</span><span class="sub2">동네에서 찾는 맞춤 학습</span></h1><p>전국 지역별·과목별 학원 정보를 한곳에서. 동네 이름으로 우리 아이에게 딱 맞는 학원을 만나보세요.</p><div class="stat"><div><b>${totalCenter}</b>등록 학원</div><div><b>${totalDong}</b>동네</div><div><b>${sidos.length}</b>시·도</div></div><div class="herobtns"><a class="hcall" href="tel:${PHONE_TEL}">📞 ${PHONE}</a><button class="hinq" onclick="openInq()">✉️ 문의하기</button></div></div>
+  const body=`<div class="hero"><div class="springbar">${springHoles}</div><span class="deco d1">📚</span><span class="deco d2">🎓</span><span class="deco d3">📐</span><div class="herobadge">✏️ 전국 ${totalDong}개 동네 · ${totalCenter}개 학원 정보</div><h1>우리 아이 공부,<br><span class="accent">세상의 모든학원</span><span class="pencil">📚</span><span class="sub2">동네에서 찾는 맞춤 학습</span></h1><p>전국 지역별·과목별 학원 정보를 한곳에서. 동네 이름으로 우리 아이에게 딱 맞는 학원을 만나보세요.</p><div class="stat"><div><b>${totalCenter}</b>등록 학원</div><div><b>${totalDong}</b>동네</div><div><b>${sidos.length}</b>시·도</div></div><div class="herobtns"><a class="hcall" href="tel:${PHONE_TEL}">📞 ${PHONE}</a><span class="telt hcall-telt">전화 ${PHONE}</span><button class="hinq" onclick="openInq()">✉️ 문의하기</button></div></div>
 
 <section class="sec"><h2>📚 과목별 학원</h2><p class="subt">국어·영어·수학·과학·사회, 초·중·고 전 과목 학원 정보를 안내합니다.</p><div class="subjgrid">${subjCards}</div></section>
 
@@ -1202,7 +1210,7 @@ function pageHome(){
 
 ${faqHtml}
 
-<div class="cta"><h2>우리 아이에게 맞는 학원을 찾고 계신가요?</h2><p>전화 또는 문의하기로 학습 상담을 받아보세요.</p><div class="ctabtns"><a class="cphone" href="tel:${PHONE_TEL}">📞 ${PHONE}</a><button class="cinq" onclick="openInq()">✉️ 문의 남기기</button></div></div>
+<div class="cta"><h2>우리 아이에게 맞는 학원을 찾고 계신가요?</h2><p>전화 또는 문의하기로 학습 상담을 받아보세요.</p><div class="ctabtns"><a class="cphone" href="tel:${PHONE_TEL}">📞 ${PHONE}</a><span class="telt cphone-telt">전화 ${PHONE}</span><button class="cinq" onclick="openInq()">✉️ 문의 남기기</button></div></div>
 
 <div class="note">전국 학원 정보를 지역·과목별로 안내합니다. 정확한 수업 시간 및 교습비는 각 학원에 방문상담을 통해 확인하시기 바랍니다.</div>`;
   return layout({title:`${SITE_NAME} | 전국 지역별·과목별 학원 정보`, desc:"전국 지역별·과목별 학원 정보를 한곳에서. 동네 이름으로 우리 아이에게 맞는 영어·수학·국어·과학·사회 학원을 찾아보세요.", canonical, jsonld:faqLd, body});
