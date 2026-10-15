@@ -1622,13 +1622,13 @@ async function tgNotify(env, type, page, ref, ua, btn,qs) {
 async function handle(request, env, ctx){
   const url=new URL(request.url);
   let path=decodeURIComponent(url.pathname).replace(/\/$/,"")||"/";
-  if(path==="/api/track"&&request.method==="POST"){try{const b=await request.json();
+  if(path==="/api/track"&&request.method==="POST"){try{const b=await request.json(); const __task=(async()=>{ try{
     /* 같은 방문자가 같은 버튼을 반복해 눌러도 1건만 기록·발송한다 */
     if (await tkDup(env, 'semoacademy', b.type, (b.page || '').slice(0, 300), request.headers.get('CF-Connecting-IP') || '')) {
       return new Response(JSON.stringify({ ok: true, dup: 1 }), { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
     }
 const ua=request.headers.get("User-Agent")||"";if(!TG_BOT_RE.test(ua)&&TG_LABEL[b.type]){const _tg=tgNotify(env, b.type,(b.page||"/").slice(0,300),b.ref||"",ua, String(b.b || "").slice(0, 40), b.q||"");if(ctx&&ctx.waitUntil)ctx.waitUntil(_tg);else await _tg;}const ip=request.headers.get("CF-Connecting-IP")||"";const ts=new Date().toISOString();if(env&&env.DB&&!(b.type==="view"&&BOT_UA_RE.test(request.headers.get("User-Agent")||"")||(b.type==="view"&&skipViewCf(request, request.headers.get("CF-Connecting-IP")||"")))&&(b.type==="tel"||b.type==="sms"||b.type==="contact"||b.type==="view")){await env.DB.prepare('INSERT INTO events (site,type,page,ref,ip,ts,ua,device,source,keyword) VALUES (?,?,?,?,?,?,?,?,?,?)')
-            .bind('semoacademy', b.type, (b.page||'').slice(0,300), (b.ref||'').slice(0,120), ip, ts, ...tkMeta(request.headers.get('User-Agent')||'', b.ref||'', 'semoacademy.com', b.q||"")).run();}}catch(e){}return new Response(JSON.stringify({ok:true}),{headers:{"content-type":"application/json","access-control-allow-origin":"*"}});}
+            .bind('semoacademy', b.type, (b.page||'').slice(0,300), (b.ref||'').slice(0,120), ip, ts, ...tkMeta(request.headers.get('User-Agent')||'', b.ref||'', 'semoacademy.com', b.q||"")).run();}}catch(e){ console.log('[track] fail', e&&e.message); } })(); if(ctx&&ctx.waitUntil) ctx.waitUntil(__task); else await __task; }catch(e){}return new Response(JSON.stringify({ok:true}),{headers:{"content-type":"application/json","access-control-allow-origin":"*"}});}
   if(path==="/api/track"&&request.method==="OPTIONS")return new Response(null,{headers:{"access-control-allow-origin":"*","access-control-allow-methods":"POST,OPTIONS","access-control-allow-headers":"Content-Type"}});
   if(path==="/") return html(pageHome());
   if(path==="/robots.txt") return robots();
