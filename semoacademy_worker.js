@@ -1,3 +1,17 @@
+/* /img/<파일> — 자기 저장소 image/ 사진 자체 서빙(2026-10-16): jsDelivr 간헐 503 대비. 허용 목록 → Cache API(IMG_VER) → GitHub raw → jsDelivr 폴백 → 1년 immutable */
+const IMG_ORIGIN="https://semoacademy.com";
+const IMG_VER="1";
+const IMG_OK=/^([A-Za-z0-9._-]+\/)?[A-Za-z0-9._-]+\.(jpe?g|png|webp|gif|svg)$/;
+async function imgProxy(request,ctx,p){
+  if(!IMG_OK.test(p)) return new Response("not found",{status:404});
+  let repo="semoacademy", rest=p;
+  const ext=p.split(".").pop().toLowerCase(); const ct=ext==="png"?"image/png":ext==="webp"?"image/webp":ext==="gif"?"image/gif":ext==="svg"?"image/svg+xml":"image/jpeg";
+  const key=new Request(IMG_ORIGIN+"/img/"+p+"?v="+IMG_VER,{method:"GET"}); const cache=(typeof caches!=="undefined"&&caches.default)?caches.default:null;
+  if(cache){ try{ const hit=await cache.match(key); if(hit) return hit; }catch(e){} }
+  const srcs=["https://raw.githubusercontent.com/dandylsk80/"+repo+"/main/image/"+rest,"https://cdn.jsdelivr.net/gh/dandylsk80/"+repo+"@main/image/"+rest];
+  for(let i=0;i<srcs.length;i++){ try{ const r=await fetch(srcs[i]); if(r.ok){ const body=await r.arrayBuffer(); const res=new Response(body,{headers:{"content-type":ct,"cache-control":"public, max-age=31536000, immutable","x-img-src":i?"jsd":"raw"}}); if(cache&&ctx&&ctx.waitUntil) ctx.waitUntil(cache.put(key,res.clone())); return res; } }catch(e){} }
+  return new Response("image unavailable",{status:502});
+}
 /* ---------- 파비콘 (18개 공통 규격: ico 16·32·48 / favicon-32.png / apple-touch-icon 180) ----------
    ~/sites/powerlandschool/tools/gen.mjs 로 생성. 경로마다 제 형식의 바이트를 돌려준다. */
 const ICON_ICO  = "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";
@@ -299,7 +313,7 @@ const THUMBS = [
   "pexels-voltfather-18243125.jpg",
   "pexels-yaroslav-shuraev-9489804.jpg",
 ];
-const THUMB_DIR = "https://cdn.jsdelivr.net/gh/dandylsk80/semoacademy@main/image";
+const THUMB_DIR = IMG_ORIGIN+"/img";
 // og:image — 1200×630 로고 카드 PNG (image/og/og-home.png). 카카오톡·네이버 미리보기 규격
 const OG_IMAGE = THUMB_DIR + "/og/og-home.png";
 function thumbFor(key){
@@ -1631,6 +1645,7 @@ const ua=request.headers.get("User-Agent")||"";if(!TG_BOT_RE.test(ua)&&TG_LABEL[
             .bind('semoacademy', b.type, (b.page||'').slice(0,300), (b.ref||'').slice(0,120), ip, ts, ...tkMeta(request.headers.get('User-Agent')||'', b.ref||'', 'semoacademy.com', b.q||"")).run();}}catch(e){ console.log('[track] fail', e&&e.message); } })(); if(ctx&&ctx.waitUntil) ctx.waitUntil(__task); else await __task; }catch(e){}return new Response(JSON.stringify({ok:true}),{headers:{"content-type":"application/json","access-control-allow-origin":"*"}});}
   if(path==="/api/track"&&request.method==="OPTIONS")return new Response(null,{headers:{"access-control-allow-origin":"*","access-control-allow-methods":"POST,OPTIONS","access-control-allow-headers":"Content-Type"}});
   if(path==="/") return html(pageHome());
+  if(path.indexOf("/img/")===0) return imgProxy(request,ctx,path.slice(5));
   if(path==="/robots.txt") return robots();
   if(path==="/llms.txt"||path==="/llms-full.txt") return llmsTxt();
   if(path.startsWith("/sitemap")||path==="/rss.xml"||path==="/rss"||path==="/feed"||path==="/atom.xml"||path==="/atom") await loadPosts(env);   /* 사이트맵·RSS 는 동기 함수 */
