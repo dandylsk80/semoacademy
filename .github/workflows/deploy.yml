@@ -8,6 +8,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: 금지 어휘 검사 (본사 마케팅 가이드)
+        run: node tools/vocab-check.mjs
       - name: Deploy
         uses: cloudflare/wrangler-action@v4
         with:
